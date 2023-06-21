@@ -4,6 +4,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 
 import android.app.Fragment;
+import android.content.Context;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -16,7 +21,7 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements SensorEventListener {
     private enum ScreenEnum {
         STARTSCREEN, GAMESCREEN
     }
@@ -37,6 +42,11 @@ public class MainActivity extends AppCompatActivity {
     private String TAG = MainActivity.class.getSimpleName();
     // die IP-Adresse bitte in SharedPreferences und über Menü änderbar
     private String BROKER = "tcp://broker.emqx.io:1883";
+    private SensorManager sensorManager;
+    private Sensor rotationSensor;
+    private long lastSensorUpdate = 0;
+    private final long SENSOR_UPDATE_INTERVAL = 500; // Intervall in Millisekunden
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +61,13 @@ public class MainActivity extends AppCompatActivity {
         }
         currentScreen = ScreenEnum.STARTSCREEN;
         inputMethod = InputMethodEnum.MPU6050;
+
+        // Initialisiere den SensorManager
+        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+
+        // Überprüfe, ob das Gerät einen Rotationssensor hat
+       rotationSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
+
     }
 
     @Override
@@ -67,6 +84,9 @@ public class MainActivity extends AppCompatActivity {
             subscribe(mpu_sub_topic);
             subscribe(temp_sub_topic);
         }
+        if (rotationSensor != null) {
+            sensorManager.registerListener(this, rotationSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        }
     }
 
     @Override
@@ -75,6 +95,7 @@ public class MainActivity extends AppCompatActivity {
         if(inputMethod == InputMethodEnum.MPU6050) {
             disconnect(mpu_sub_topic, temp_sub_topic);
         }
+        sensorManager.unregisterListener(this);
     }
 
     public void onPlayButtonClick(View view) {
@@ -218,5 +239,37 @@ public class MainActivity extends AppCompatActivity {
         } catch (MqttException e) {
             e.printStackTrace();
         }
+    }
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        // Überprüfe, ob es sich um den Rotationssensor handelt
+        if (event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
+            long currentTime = System.currentTimeMillis();
+            if (currentTime - lastSensorUpdate >= SENSOR_UPDATE_INTERVAL) {
+                // Erhalte die Rotationswerte aus dem SensorEvent
+                float[] rotationMatrix = new float[9];
+                SensorManager.getRotationMatrixFromVector(rotationMatrix, event.values);
+
+                // Erhalte die Rotationswerte in Grad
+                float[] rotationValues = new float[3];
+                SensorManager.getOrientation(rotationMatrix, rotationValues);
+
+                // Die Rotationswerte sind in Bogenmaß, daher umwandeln in Grad
+                float azimuthDegrees = (float) Math.toDegrees(rotationValues[0]);
+                float pitchDegrees = (float) Math.toDegrees(rotationValues[1]);
+                float rollDegrees = (float) Math.toDegrees(rotationValues[2]);
+
+                // Hier kannst du die Rotationswerte verwenden
+                // z.B. Logausgabe der Werte
+                Log.d("Rotationswerte", "Azimuth: " + azimuthDegrees + " Pitch: " + pitchDegrees + " Roll: " + rollDegrees);
+
+                lastSensorUpdate = currentTime;
+            }
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        // Nicht benötigt, kann leer bleiben
     }
 }
