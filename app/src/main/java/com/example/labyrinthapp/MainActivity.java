@@ -21,7 +21,9 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
+
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
+
     private enum ScreenEnum {
         STARTSCREEN, GAMESCREEN
     }
@@ -48,10 +50,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private final long SENSOR_UPDATE_INTERVAL = 500; // Intervall in Millisekunden
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Log.d(TAG, "First ONCREATE");
 
         if(savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
@@ -103,7 +108,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 .setReorderingAllowed(true)
                 .replace(R.id.fragment_container_view, GameScreenFragment.class, null)
                 .commit();
-        currentScreen = ScreenEnum.GAMESCREEN;
+
+        currentScreen = MainActivity.ScreenEnum.GAMESCREEN;
     }
 
     public void onHomeButtonClick(View view) {
