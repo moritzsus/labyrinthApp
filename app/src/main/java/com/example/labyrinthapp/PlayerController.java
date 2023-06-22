@@ -71,7 +71,7 @@ public class PlayerController {
                 break;
             default:
         }
-
+        //TODO im ziel -> direction NONE
         labyrinthView.setPlayerIndex(playerPositionRow, playerPositionCol);
     }
 }
