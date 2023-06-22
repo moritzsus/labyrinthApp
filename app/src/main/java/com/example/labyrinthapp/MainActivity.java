@@ -45,9 +45,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     // die IP-Adresse bitte in SharedPreferences und über Menü änderbar
     private String BROKER = "tcp://broker.emqx.io:1883";
     private SensorManager sensorManager;
-    private Sensor rotationSensor;
+    private Sensor gyroSensor;
     private long lastSensorUpdate = 0;
     private final long SENSOR_UPDATE_INTERVAL = 500; // Intervall in Millisekunden
+    PlayerController playerController;
 
 
 
@@ -71,7 +72,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
         // Überprüfe, ob das Gerät einen Rotationssensor hat
-       rotationSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
+        gyroSensor = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
 
     }
 
@@ -89,8 +90,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             subscribe(mpu_sub_topic);
             subscribe(temp_sub_topic);
         }
-        if (rotationSensor != null) {
-            sensorManager.registerListener(this, rotationSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        if (gyroSensor != null) {
+            sensorManager.registerListener(this, gyroSensor, SensorManager.SENSOR_DELAY_NORMAL);
         }
     }
 
@@ -246,30 +247,20 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             e.printStackTrace();
         }
     }
+
     @Override
-    public void onSensorChanged(SensorEvent event) {
-        // Überprüfe, ob es sich um den Rotationssensor handelt
-        if (event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
-            long currentTime = System.currentTimeMillis();
-            if (currentTime - lastSensorUpdate >= SENSOR_UPDATE_INTERVAL) {
-                // Erhalte die Rotationswerte aus dem SensorEvent
-                float[] rotationMatrix = new float[9];
-                SensorManager.getRotationMatrixFromVector(rotationMatrix, event.values);
+    public void onSensorChanged(SensorEvent sensorEvent) {
+        if(currentScreen == ScreenEnum.GAMESCREEN) {
+            if (sensorEvent.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
+                long currentTime = System.currentTimeMillis();
+                if (currentTime - lastSensorUpdate >= SENSOR_UPDATE_INTERVAL) {
+                    float x = sensorEvent.values[0];
+                    float y = sensorEvent.values[1];
+                    float z = sensorEvent.values[2];
 
-                // Erhalte die Rotationswerte in Grad
-                float[] rotationValues = new float[3];
-                SensorManager.getOrientation(rotationMatrix, rotationValues);
-
-                // Die Rotationswerte sind in Bogenmaß, daher umwandeln in Grad
-                float azimuthDegrees = (float) Math.toDegrees(rotationValues[0]);
-                float pitchDegrees = (float) Math.toDegrees(rotationValues[1]);
-                float rollDegrees = (float) Math.toDegrees(rotationValues[2]);
-
-                // Hier kannst du die Rotationswerte verwenden
-                // z.B. Logausgabe der Werte
-                Log.d("Rotationswerte", "Azimuth: " + azimuthDegrees + " Pitch: " + pitchDegrees + " Roll: " + rollDegrees);
-
-                lastSensorUpdate = currentTime;
+                    PlayerController.getInstance().movePlayer(x, y, z);
+                    lastSensorUpdate = currentTime;
+                }
             }
         }
     }

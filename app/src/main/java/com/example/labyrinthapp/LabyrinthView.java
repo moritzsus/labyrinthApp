@@ -20,6 +20,9 @@ public class LabyrinthView extends AppCompatImageView {
     private Paint entrancePaint;
     private Paint exitPaint;
     private Paint boundaryPaint;
+    int currentPlayerXpos;
+    int currentPlayerYpos;
+    Canvas canvas;
 
     public LabyrinthView(Context context, AttributeSet attrSet) {
         super(context, attrSet);
@@ -46,15 +49,28 @@ public class LabyrinthView extends AppCompatImageView {
         exitPaint = new Paint();
         exitPaint.setColor(Color.GREEN);
         exitPaint.setStyle(Paint.Style.FILL);
+
+        currentPlayerXpos = 0;
+        currentPlayerYpos = 1;
     }
 
     public void setLabyrinth(int[][] labyrinth) {
         this.labyrinth = labyrinth;
+        PlayerController.getInstance().setLabyrinth(labyrinth);
+        PlayerController.getInstance().setPlayerPaint(entrancePaint);
+        PlayerController.getInstance().setLabyrinthView(this);
+    }
+
+    public void setPlayerIndex(int x, int y) {
+        currentPlayerXpos = x;
+        currentPlayerYpos = y;
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+
+        this.canvas = canvas;
 
         int viewWidth = getWidth();
         int viewHeight = getHeight();
@@ -83,5 +99,14 @@ public class LabyrinthView extends AppCompatImageView {
                 }
             }
         }
+        drawPlayer(currentPlayerXpos, currentPlayerYpos);
+        invalidate();
+    }
+    private void drawPlayer(int labX, int labY) {
+        float left = labY * cellSize + (getWidth() / 8);
+        float top = labX * cellSize;
+        float right = left + cellSize;
+        float bottom = top + cellSize;
+        canvas.drawRect(left, top, right, bottom, entrancePaint);
     }
 }

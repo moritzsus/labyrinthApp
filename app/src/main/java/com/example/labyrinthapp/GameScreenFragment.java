@@ -17,8 +17,8 @@ import java.util.Collections;
 public class GameScreenFragment extends Fragment {
     View rootView;
     private LabyrinthView labyrinthView;
-    private int rows = 16;
-    private int cols = 16;
+    private int rows = 12;
+    private int cols = 12;
     private int[][] labyrinth;
 
     @Override
