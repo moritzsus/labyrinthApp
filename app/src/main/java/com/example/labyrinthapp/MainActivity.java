@@ -97,6 +97,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     protected void onPause() {
+        //TODO Handydaten Pausieren/resumen
         super.onPause();
         if(inputMethod == InputMethodEnum.MPU6050) {
             disconnect(mpu_sub_topic, temp_sub_topic);
@@ -201,8 +202,19 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             client.subscribe(topic, qos, new IMqttMessageListener() {
                 @Override
                 public void messageArrived(String topic, MqttMessage msg) throws Exception {
+                    if(currentScreen != ScreenEnum.GAMESCREEN)
+                        return;
                     String message = new String(msg.getPayload());
-                    Log.d(TAG, "Message with topic " + topic + " arrived: " + message);
+                    String[] values = message.split(",");
+
+                    // 6 sind bewegungssensoren, 2 temp und counter
+                    if(values.length == 6) {
+                        float x = Float.parseFloat(values[3]);
+                        float y = Float.parseFloat(values[4]);
+                        float z = Float.parseFloat(values[5]);
+
+                        PlayerController.getInstance().movePlayer(x, y, z);
+                    }
                 }
             });
             Log.d(TAG, "subscribed to topic " + topic);
@@ -250,6 +262,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
+        if(inputMethod == InputMethodEnum.MPU6050)
+            return;
+
         if(currentScreen == ScreenEnum.GAMESCREEN) {
             if (sensorEvent.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
                 long currentTime = System.currentTimeMillis();

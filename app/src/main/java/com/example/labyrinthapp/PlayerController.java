@@ -58,16 +58,26 @@ public class PlayerController {
 
         switch (direction) {
             case UP:
-                playerPositionRow--;
+                if(playerPositionRow - 1 < 0)
+                    break;
+                if(labyrinth[playerPositionRow - 1][playerPositionCol] == 0) {
+                    playerPositionRow--;
+                }
                 break;
             case DOWN:
-                playerPositionRow++;
+                if(playerPositionRow + 1 > (labyrinth.length - 1))
+                    break;
+                if(labyrinth[playerPositionRow + 1][playerPositionCol] == 0) {
+                    playerPositionRow++;
+                }
                 break;
             case LEFT:
-                playerPositionCol--;
+                if(labyrinth[playerPositionRow][playerPositionCol - 1] == 0)
+                    playerPositionCol--;
                 break;
             case RIGHT:
-                playerPositionCol++;
+                if(labyrinth[playerPositionRow][playerPositionCol + 1] == 0)
+                    playerPositionCol++;
                 break;
             default:
         }
