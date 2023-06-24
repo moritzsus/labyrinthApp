@@ -22,28 +22,26 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
-
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
 
     public enum ScreenEnum {
         STARTSCREEN, GAMESCREEN, SETTINGSSCREEN, BESTENLISTESCREEN
     }
     ScreenEnum currentScreen;
+    //TODO lastScreen löschen?
     ScreenEnum lastScreen;
 
     private enum InputMethodEnum {
         MPU6050, SMARTPHONESENSOR
     }
     InputMethodEnum inputMethod;
+    private String TAG = MainActivity.class.getSimpleName();
 
+    //TODO change topics to M02
+    MqttHandler mqttHandler = new MqttHandler();
     private static final String mpu_sub_topic = "mpu/M03";
     private static final String temp_sub_topic = "temp/M03";
     private static final String pub_topic = "finished/M03";
-    private int qos = 0;
-    private String clientId;
-    private MemoryPersistence persistence = new MemoryPersistence();
-    private MqttClient client;
-    private String TAG = MainActivity.class.getSimpleName();
     //TODO die IP-Adresse bitte in SharedPreferences (und über Menü änderbar)
     private String BROKER = "tcp://broker.emqx.io:1883";
     private SensorManager sensorManager;
@@ -64,8 +62,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Log.d(TAG, "First ONCREATE");
-
         if(savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
                     .setReorderingAllowed(true)
@@ -80,12 +76,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         // Überprüfe, ob das Gerät einen Rotationssensor hat
         gyroSensor = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
-
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
     }
 
     @Override
@@ -93,9 +83,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         super.onResume();
 
         if(inputMethod == InputMethodEnum.MPU6050) {
-            connect(BROKER);
-            subscribe(mpu_sub_topic);
-            subscribe(temp_sub_topic);
+            mqttHandler.connect(BROKER);
+            mqttHandler.subscribe(mpu_sub_topic);
+            mqttHandler.subscribe(temp_sub_topic);
         }
         if (gyroSensor != null) {
             sensorManager.registerListener(this, gyroSensor, SensorManager.SENSOR_DELAY_NORMAL);
@@ -107,7 +97,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         //TODO Handydaten Pausieren/resumen
         super.onPause();
         if(inputMethod == InputMethodEnum.MPU6050) {
-            disconnect(mpu_sub_topic, temp_sub_topic);
+            mqttHandler.disconnect(mpu_sub_topic, temp_sub_topic);
         }
         sensorManager.unregisterListener(this);
     }
@@ -187,108 +177,20 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         if(inputMethod == InputMethodEnum.MPU6050) return;
 
         inputMethod = InputMethodEnum.MPU6050;
-        connect(BROKER);
-        subscribe(mpu_sub_topic);
-        subscribe(temp_sub_topic);
+        mqttHandler.connect(BROKER);
+        mqttHandler.subscribe(mpu_sub_topic);
+        mqttHandler.subscribe(temp_sub_topic);
     }
 
     public void onSDClick(View view) {
         if(inputMethod == InputMethodEnum.SMARTPHONESENSOR) return;
 
         inputMethod = InputMethodEnum.SMARTPHONESENSOR;
-        disconnect(mpu_sub_topic, temp_sub_topic);
+        mqttHandler.disconnect(mpu_sub_topic, temp_sub_topic);
     }
 
     public void onGameFinished() {
-        publish(pub_topic, "Game Finished");
-    }
-
-    /**
-     * Connect to broker and
-     * @param broker Broker to connect to
-     */
-    private void connect (String broker) {
-        try {
-            clientId = MqttClient.generateClientId();
-            client = new MqttClient(broker, clientId, persistence);
-            MqttConnectOptions connOpts = new MqttConnectOptions();
-            connOpts.setCleanSession(true);
-            Log.d(TAG, "Connecting to broker: " + broker);
-            client.connect(connOpts);
-            Log.d(TAG, "Connected with broker: " + broker);
-        } catch (MqttException me) {
-            Log.e(TAG, "Reason: " + me.getReasonCode());
-            Log.e(TAG, "Message: " + me.getMessage());
-            Log.e(TAG, "localizedMsg: " + me.getLocalizedMessage());
-            Log.e(TAG, "cause: " + me.getCause());
-            Log.e(TAG, "exception: " + me);
-        }
-    }
-
-    /**
-     * Subscribes to a given topic
-     * @param topic Topic to subscribe to
-     */
-    private void subscribe(String topic) {
-        try {
-            client.subscribe(topic, qos, new IMqttMessageListener() {
-                @Override
-                public void messageArrived(String topic, MqttMessage msg) throws Exception {
-                    if(currentScreen != ScreenEnum.GAMESCREEN)
-                        return;
-                    String message = new String(msg.getPayload());
-                    String[] values = message.split(",");
-
-                    // 6 sind bewegungssensoren, 2 temp und counter
-                    if(values.length == 6) {
-                        float x = Float.parseFloat(values[3]);
-                        float y = Float.parseFloat(values[4]);
-
-                        PlayerController.getInstance().movePlayer(x, y);
-                    }
-                }
-            });
-            Log.d(TAG, "subscribed to topic " + topic);
-        } catch (MqttException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Unsubscribe from default topic (please unsubscribe from further
-     * topics prior to calling this function)
-     */
-    private void disconnect(String mpu_topic, String temp_topic) {
-        try {
-            client.unsubscribe(mpu_topic);
-            client.unsubscribe(temp_topic);
-        } catch (MqttException e) {
-            e.printStackTrace();
-            Log.e(TAG, e.getMessage());
-        }
-        try {
-            Log.d(TAG, "Disconnecting from broker");
-            client.disconnect();
-            Log.d(TAG, "Disconnected.");
-        } catch (MqttException me) {
-            Log.e(TAG, me.getMessage());
-        }
-    }
-
-    /**
-     * Publishes a message via MQTT (with fixed topic)
-     * @param topic topic to publish with
-     * @param msg message to publish with publish topic
-     */
-    private void publish(String topic, String msg) {
-        MqttMessage message = new MqttMessage(msg.getBytes());
-        message.setQos(qos);
-        try {
-            client.publish(topic, message);
-            Log.d(TAG, "PUBLISHED FINISH");
-        } catch (MqttException e) {
-            e.printStackTrace();
-        }
+        mqttHandler.publish(pub_topic, "Game Finished");
     }
 
     @Override
