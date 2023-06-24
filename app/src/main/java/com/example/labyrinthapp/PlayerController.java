@@ -47,7 +47,7 @@ public class PlayerController {
     }
 
     // rotation values
-    public void movePlayer(float x, float y, float z) {
+    public void movePlayer(float x, float y) {
         if(labyrinthView == null) {
             Log.d("Rotationswerte", "LABVEW NULL");
         }
@@ -57,11 +57,19 @@ public class PlayerController {
             direction = Direction.NONE;
         }
 
-        //TODO fehleingaben raus
-        if(x > verticalDeazone) direction = Direction.DOWN;
-        if(x < -verticalDeazone) direction = Direction.UP;
-        if(y < -horizontalDeazone) direction = Direction.LEFT;
-        if(y > horizontalDeazone) direction = Direction.RIGHT;
+        boolean up = false;
+        boolean down = false;
+        boolean left = false;
+        boolean right = false;
+
+        // set direction flags
+        if(x < -verticalDeazone) up = true;
+        if(x > verticalDeazone) down = true;
+        if(y < -horizontalDeazone) left = true;
+        if(y > horizontalDeazone) right = true;
+
+        // set direction depending on the flags
+        determineDirection(up, down, left, right);
 
         switch (direction) {
             case UP:
@@ -89,6 +97,7 @@ public class PlayerController {
             default:
         }
         //TODO im ziel -> direction NONE
+        //TODO wenn Abbruch -> Homescreen -> direction NONE
         labyrinthView.setPlayerIndex(playerPositionRow, playerPositionCol);
 
         // Ziel
@@ -104,6 +113,43 @@ public class PlayerController {
                 GameScreenFragment.getInstance().sendLabyrinthToView();
                 direction = Direction.NONE;
             }
+        }
+    }
+
+    private void determineDirection(boolean up, boolean down, boolean left, boolean right) {
+        if(direction == Direction.NONE) {
+            if(up) direction = Direction.UP;
+            if(down) direction = Direction.DOWN;
+            if(left) direction = Direction.LEFT;
+            if(right) direction = Direction.RIGHT;
+        }
+        else if(direction == Direction.UP) {
+            if(down && left) direction = Direction.LEFT;
+            if(down && right) direction = Direction.RIGHT;
+            if(down && !left && !right) direction = Direction.DOWN;
+            if(!down && left) direction = Direction.LEFT;
+            if(!down && right) direction = Direction.RIGHT;
+        }
+        else if(direction == Direction.DOWN) {
+            if(up && left) direction = Direction.LEFT;
+            if(up && right) direction = Direction.RIGHT;
+            if(up && !left && !right) direction = Direction.UP;
+            if(!up && left) direction = Direction.LEFT;
+            if(!up && right) direction = Direction.RIGHT;
+        }
+        else if(direction == Direction.LEFT) {
+            if(right && up) direction = Direction.UP;
+            if(right && down) direction = Direction.DOWN;
+            if(right && !up && !down) direction = Direction.RIGHT;
+            if(!right && up) direction = Direction.UP;
+            if(!right && down) direction = Direction.DOWN;
+        }
+        else if(direction == Direction.RIGHT) {
+            if(left && up) direction = Direction.UP;
+            if(left && down) direction = Direction.DOWN;
+            if(left && !up && !down) direction = Direction.LEFT;
+            if(!left && up) direction = Direction.UP;
+            if(!left && down) direction = Direction.DOWN;
         }
     }
 }
