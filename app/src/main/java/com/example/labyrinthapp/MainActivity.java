@@ -24,10 +24,11 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
 
-    private enum ScreenEnum {
-        STARTSCREEN, GAMESCREEN
+    public enum ScreenEnum {
+        STARTSCREEN, GAMESCREEN, SETTINGSSCREEN, BESTENLISTESCREEN
     }
     ScreenEnum currentScreen;
+    ScreenEnum lastScreen;
 
     private enum InputMethodEnum {
         MPU6050, SMARTPHONESENSOR
@@ -48,9 +49,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private Sensor gyroSensor;
     private long lastSensorUpdate = 0;
     private final long SENSOR_UPDATE_INTERVAL = 500; // Intervall in Millisekunden
-    PlayerController playerController;
+    static private MainActivity instance;
 
-
+    public MainActivity() {
+        if(instance == null)
+            instance = this;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,10 +109,21 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         sensorManager.unregisterListener(this);
     }
 
+    public static MainActivity getInstance() {
+        if(instance == null)
+            return new MainActivity();
+        return instance;
+    }
+
+    public ScreenEnum getCurrentScreen() {
+        return currentScreen;
+    }
+
     public void onPlayButtonClick(View view) {
         getSupportFragmentManager().beginTransaction()
                 .setReorderingAllowed(true)
                 .replace(R.id.fragment_container_view, GameScreenFragment.class, null)
+                .addToBackStack(null)
                 .commit();
 
         currentScreen = MainActivity.ScreenEnum.GAMESCREEN;
@@ -118,37 +133,39 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         getSupportFragmentManager().beginTransaction()
                 .setReorderingAllowed(true)
                 .replace(R.id.fragment_container_view, StartScreenFragment.class, null)
+                .addToBackStack(null)
                 .commit();
+
         currentScreen = ScreenEnum.STARTSCREEN;
     }
 
     public void onSettingsClick(View view) {
+        lastScreen = currentScreen;
+
         getSupportFragmentManager().beginTransaction()
                 .setReorderingAllowed(true)
                 .add(R.id.fragment_container_view, SettingsFragment.class, null)
+                .addToBackStack(null)
                 .commit();
+
+        currentScreen = ScreenEnum.SETTINGSSCREEN;
     }
 
     public void onCloseClick(View view) {
-        if(currentScreen == ScreenEnum.STARTSCREEN) {
-            getSupportFragmentManager().beginTransaction()
-                    .setReorderingAllowed(true)
-                    .replace(R.id.fragment_container_view, StartScreenFragment.class, null)
-                    .commit();
-        }
-        else {
-            getSupportFragmentManager().beginTransaction()
-                    .setReorderingAllowed(true)
-                    .replace(R.id.fragment_container_view, GameScreenFragment.class, null)
-                    .commit();
-        }
+        currentScreen = lastScreen;
+        getSupportFragmentManager().popBackStack();
     }
 
     public void onBestenlisteClick(View view) {
+        lastScreen = currentScreen;
+
         getSupportFragmentManager().beginTransaction()
                 .setReorderingAllowed(true)
                 .add(R.id.fragment_container_view, BestenlisteFragment.class, null)
+                .addToBackStack(null)
                 .commit();
+
+        currentScreen = ScreenEnum.BESTENLISTESCREEN;
     }
 
     public void onMPUClick(View view) {

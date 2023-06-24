@@ -17,29 +17,44 @@ import java.util.Collections;
 public class GameScreenFragment extends Fragment {
     View rootView;
     private LabyrinthView labyrinthView;
-    private int rows = 12;
-    private int cols = 12;
+    private int rows = 6;
+    private int cols = 6;
     private int[][] labyrinth;
+    static GameScreenFragment instance;
+
+    public GameScreenFragment() {
+        Log.d("Rotationswerte", "GAMESCREEN CONSTRUCTOR");
+        instance = this;
+    }
+
+    static GameScreenFragment getInstance() {
+        if(GameScreenFragment.instance == null)
+            return new GameScreenFragment();
+
+        return instance;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_game_screen, container, false);
+
+        labyrinthView = rootView.findViewById(R.id.labyrinthView);
+        generateLabyrinth();
+        sendLabyrinthToView();
         return rootView;
     }
 
     @Override
     public void onResume() {
         super.onResume();
-
-        labyrinthView = rootView.findViewById(R.id.labyrinthView);
-
-        generateLabyrinth();
-        labyrinthView.setLabyrinth(labyrinth);
-        labyrinthView.invalidate();
     }
 
-    private void generateLabyrinth() {
+    public void sendLabyrinthToView() {
+        labyrinthView.setLabyrinth(labyrinth);
+    }
+
+    public void generateLabyrinth() {
         int expandedRows = 2 * rows + 1;
         int expandedCols = 2 * cols + 1;
 
