@@ -5,72 +5,50 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".GameScreenFragment"
-    android:id="@+id/fragmentGameScreen">
+    android:id="@+id/fragmentGameScreen"
+    android:background="@color/backgroundColor">
 
 
-    <TextView
-        android:id="@+id/textViewGameScreen"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@color/design_default_color_on_secondary"
-        android:text="GAMESCREEN"
-        android:textSize="35sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.5" />
-
-    <Button
+    <ImageButton
         android:id="@+id/buttonHome"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="@color/backgroundColor"
         android:onClick="onHomeButtonClick"
-        android:text="HOMER"
-        app:layout_constraintBottom_toTopOf="@+id/textViewGameScreen"
+        android:src="@drawable/icon_home"
+        app:layout_constraintBottom_toTopOf="@+id/labyrinthView"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="0.02"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintVertical_bias="0.060000002" />
 
-    <Button
-        android:id="@+id/buttonSettings"
+    <ImageButton
+        android:id="@+id/imageButton2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="onSettingsClick"
-        android:text="SETTINGS"
-        app:layout_constraintBottom_toTopOf="@+id/textViewGameScreen"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.96"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
-
-    <Button
-        android:id="@+id/button3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:background="@color/backgroundColor"
         android:onClick="onBestenlisteClick"
-        android:text="Bestenliste"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:src="@drawable/icon_medal"
+        app:layout_constraintBottom_toTopOf="@+id/labyrinthView"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.51"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintHorizontal_bias="0.78"
+        app:layout_constraintStart_toEndOf="@+id/buttonHome"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintVertical_bias="0.060000002" />
 
-    <Button
-        android:id="@+id/testFinished"
+    <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="onGameFinished"
-        android:text="FINISH"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:background="@color/backgroundColor"
+        android:onClick="onSettingsClick"
+        android:src="@drawable/icon_settings"
+        app:layout_constraintBottom_toTopOf="@+id/labyrinthView"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewGameScreen" />
+        app:layout_constraintHorizontal_bias="0.92"
+        app:layout_constraintStart_toEndOf="@+id/imageButton2"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.060000002" />
 
     <com.example.labyrinthapp.LabyrinthView
         android:id="@+id/labyrinthView"
@@ -79,6 +57,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/button3" />
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

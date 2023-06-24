@@ -12,6 +12,7 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
@@ -49,6 +50,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private Sensor gyroSensor;
     private long lastSensorUpdate = 0;
     private final long SENSOR_UPDATE_INTERVAL = 500; // Intervall in Millisekunden
+    private EditText nameText;
     static private MainActivity instance;
 
     public MainActivity() {
@@ -120,6 +122,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     public void onPlayButtonClick(View view) {
+        EditText name = StartScreenFragment.getInstance().getNameEditText();
+        String nametxt = name.getText().toString();
+        if(nametxt.length() == 0) {
+            return;
+        }
+        StartScreenFragment.getInstance().setNameString(nametxt);
+
         getSupportFragmentManager().beginTransaction()
                 .setReorderingAllowed(true)
                 .replace(R.id.fragment_container_view, GameScreenFragment.class, null)
@@ -136,6 +145,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 .addToBackStack(null)
                 .commit();
 
+        //TODO fix or delete
+        //String name = StartScreenFragment.getInstance().getNameString();
+        //Log.d("...", "NAME: " + name);
+        //EditText nameEditText = StartScreenFragment.getInstance().getNameEditText();
+        //nameEditText.setText("TESTNAME");
         currentScreen = ScreenEnum.STARTSCREEN;
     }
 
@@ -184,7 +198,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         disconnect(mpu_sub_topic, temp_sub_topic);
     }
 
-    public void onGameFinished(View view) {
+    public void onGameFinished() {
         publish(pub_topic, "Game Finished");
     }
 
@@ -280,7 +294,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public void onSensorChanged(SensorEvent sensorEvent) {
         if(inputMethod == InputMethodEnum.MPU6050)
             return;
-
+            // TODO falls Zeit accelerometer
         if(currentScreen == ScreenEnum.GAMESCREEN) {
             if (sensorEvent.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
                 long currentTime = System.currentTimeMillis();

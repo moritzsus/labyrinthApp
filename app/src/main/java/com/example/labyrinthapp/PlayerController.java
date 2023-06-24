@@ -104,6 +104,7 @@ public class PlayerController {
         if(playerPositionRow == labyrinth.length - 1 && playerPositionCol == labyrinth[0].length - 2) {
             if(level == 5) {
                 Log.d("Rotationswerte", "ALL FINISHED");
+                MainActivity.getInstance().onGameFinished();
             }
             else {
                 //TODO erster frame bei neuem labyrinth ist player noch im ziel
