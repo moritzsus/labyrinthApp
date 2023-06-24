@@ -17,6 +17,7 @@ public class PlayerController {
     LabyrinthView labyrinthView;
     private float verticalDeazone = 0.2f;
     private float horizontalDeazone = 0.5f;
+    private int level = 1;
 
     public PlayerController() {
         playerPositionRow = 0;
@@ -51,6 +52,12 @@ public class PlayerController {
             Log.d("Rotationswerte", "LABVEW NULL");
         }
 
+        // movement paused
+        if(MainActivity.getInstance().getCurrentScreen() != MainActivity.ScreenEnum.GAMESCREEN) {
+            direction = Direction.NONE;
+        }
+
+        //TODO fehleingaben raus
         if(x > verticalDeazone) direction = Direction.DOWN;
         if(x < -verticalDeazone) direction = Direction.UP;
         if(y < -horizontalDeazone) direction = Direction.LEFT;
@@ -83,5 +90,20 @@ public class PlayerController {
         }
         //TODO im ziel -> direction NONE
         labyrinthView.setPlayerIndex(playerPositionRow, playerPositionCol);
+
+        // Ziel
+        if(playerPositionRow == labyrinth.length - 1 && playerPositionCol == labyrinth[0].length - 2) {
+            if(level == 5) {
+                Log.d("Rotationswerte", "ALL FINISHED");
+            }
+            else {
+                //TODO erster frame bei neuem labyrinth ist player noch im ziel
+                Log.d("Rotationswerte", "Level " + level + " FINISHED");
+                level++;
+                GameScreenFragment.getInstance().generateLabyrinth();
+                GameScreenFragment.getInstance().sendLabyrinthToView();
+                direction = Direction.NONE;
+            }
+        }
     }
 }
