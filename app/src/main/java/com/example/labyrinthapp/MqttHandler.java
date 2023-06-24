@@ -19,10 +19,12 @@ public class MqttHandler {
      * @param broker Broker to connect to
      */
     public void connect (String broker) {
+        //TODO toast anzeigen ob erfolgreich?
         try {
             clientId = MqttClient.generateClientId();
             client = new MqttClient(broker, clientId, persistence);
             MqttConnectOptions connOpts = new MqttConnectOptions();
+            //TODO maybe here crash?
             connOpts.setCleanSession(true);
             Log.d("MQTT", "Connecting to broker: " + broker);
             client.connect(connOpts);

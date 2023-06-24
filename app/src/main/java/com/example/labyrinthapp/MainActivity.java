@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.TextView;
 
 import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
@@ -26,15 +27,16 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     public enum ScreenEnum {
         STARTSCREEN, GAMESCREEN, SETTINGSSCREEN, BESTENLISTESCREEN
+        //TODO renam bestenlsite?
     }
-    ScreenEnum currentScreen;
+    ScreenEnum currentScreen = ScreenEnum.STARTSCREEN;;
     //TODO lastScreen löschen?
     ScreenEnum lastScreen;
 
-    private enum InputMethodEnum {
+    public enum InputMethodEnum {
         MPU6050, SMARTPHONESENSOR
     }
-    InputMethodEnum inputMethod;
+    InputMethodEnum inputMethod = InputMethodEnum.SMARTPHONESENSOR;;
     private String TAG = MainActivity.class.getSimpleName();
 
     //TODO change topics to M02
@@ -43,7 +45,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private static final String temp_sub_topic = "temp/M03";
     private static final String pub_topic = "finished/M03";
     //TODO die IP-Adresse bitte in SharedPreferences (und über Menü änderbar)
+    //TODO BROKER -> broker?
     private String BROKER = "tcp://broker.emqx.io:1883";
+    private EditText editTextBroker;
     private SensorManager sensorManager;
     private Sensor gyroSensor;
     private long lastSensorUpdate = 0;
@@ -68,8 +72,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     .add(R.id.fragment_container_view, StartScreenFragment.class, null)
                     .commit();
         }
-        currentScreen = ScreenEnum.STARTSCREEN;
-        inputMethod = InputMethodEnum.MPU6050;
 
         // Initialisiere den SensorManager
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
@@ -111,6 +113,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public ScreenEnum getCurrentScreen() {
         return currentScreen;
     }
+    public InputMethodEnum getInputMethod() { return inputMethod; }
 
     public void onPlayButtonClick(View view) {
         EditText name = StartScreenFragment.getInstance().getNameEditText();
@@ -156,6 +159,22 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         currentScreen = ScreenEnum.SETTINGSSCREEN;
     }
 
+    public void onBrokerSaveClick(View view) {
+        editTextBroker = findViewById(R.id.editTextBroker);
+        BROKER = editTextBroker.getText().toString();
+        Log.d("SAVE", "SAVE: " + BROKER);
+
+         //connect to new broker if inputMehod is MPU - if not, checking the radio button will automatically connect to new broker
+        if(inputMethod == InputMethodEnum.MPU6050) {
+            //TODO fix crash when connecting to entered broker
+            mqttHandler.disconnect(mpu_sub_topic, temp_sub_topic);
+
+            mqttHandler.connect(BROKER);
+            mqttHandler.subscribe(mpu_sub_topic);
+            mqttHandler.subscribe(temp_sub_topic);
+        }
+    }
+
     public void onCloseClick(View view) {
         currentScreen = lastScreen;
         getSupportFragmentManager().popBackStack();
@@ -182,7 +201,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         mqttHandler.subscribe(temp_sub_topic);
     }
 
-    public void onSDClick(View view) {
+    public void onSmartphoneSensorClick(View view) {
         if(inputMethod == InputMethodEnum.SMARTPHONESENSOR) return;
 
         inputMethod = InputMethodEnum.SMARTPHONESENSOR;

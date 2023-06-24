@@ -35,30 +35,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.01999998" />
 
-    <Button
-        android:id="@+id/button2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="onMPUClick"
-        android:text="MPU"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/button3"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.9" />
-
-    <Button
-        android:id="@+id/button3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="onSDClick"
-        android:text="SD"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.89"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button2" />
-
     <TextView
         android:id="@+id/textView2"
         android:layout_width="wrap_content"
@@ -110,22 +86,25 @@
         app:layout_constraintVertical_bias="0.04000002">
 
         <RadioButton
-            android:id="@+id/radioButton2"
+            android:id="@+id/radioButtonSPSens"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="5dp"
+            android:checked="true"
             android:text="Smartphone Sensors"
             android:textColor="@color/white"
-            android:textSize="16dp" />
+            android:textSize="16dp"
+            android:onClick="onSmartphoneSensorClick"/>
 
         <RadioButton
-            android:id="@+id/radioButton"
+            android:id="@+id/radioButtonMpu"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="5dp"
             android:text="MPU6050"
             android:textColor="@color/white"
-            android:textSize="16dp" />
+            android:textSize="16dp"
+            android:onClick="onMPUClick" />
     </RadioGroup>
 
     <EditText
@@ -152,6 +131,7 @@
         android:padding="0dp"
         android:backgroundTint="@color/design_default_color_error"
         android:text="Save"
+        android:onClick="onBrokerSaveClick"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

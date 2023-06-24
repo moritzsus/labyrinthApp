@@ -112,6 +112,7 @@ public class PlayerController {
                 level++;
                 GameScreenFragment.getInstance().generateLabyrinth();
                 GameScreenFragment.getInstance().sendLabyrinthToView();
+                //TODO keep direction?
                 direction = Direction.NONE;
             }
         }
