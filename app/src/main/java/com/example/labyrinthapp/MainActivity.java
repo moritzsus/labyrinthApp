@@ -228,9 +228,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     if(values.length == 6) {
                         float x = Float.parseFloat(values[3]);
                         float y = Float.parseFloat(values[4]);
-                        float z = Float.parseFloat(values[5]);
 
-                        PlayerController.getInstance().movePlayer(x, y, z);
+                        PlayerController.getInstance().movePlayer(x, y);
                     }
                 }
             });
@@ -285,12 +284,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         if(currentScreen == ScreenEnum.GAMESCREEN) {
             if (sensorEvent.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
                 long currentTime = System.currentTimeMillis();
+                // TODO falls Zeit, immer prüfen, nur alle 500ms an moveplayer schicken, damit bewegungen zwischen 2 ticks td erkannt werden (muss direction hier speichern?)
                 if (currentTime - lastSensorUpdate >= SENSOR_UPDATE_INTERVAL) {
                     float x = sensorEvent.values[0];
                     float y = sensorEvent.values[1];
-                    float z = sensorEvent.values[2];
 
-                    PlayerController.getInstance().movePlayer(x, y, z);
+                    PlayerController.getInstance().movePlayer(x, y);
                     lastSensorUpdate = currentTime;
                 }
             }
