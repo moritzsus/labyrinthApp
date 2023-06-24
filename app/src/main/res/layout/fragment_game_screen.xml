@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".GameScreenFragment">
+    tools:context=".GameScreenFragment"
+    android:id="@+id/fragmentGameScreen">
 
 
     <TextView
@@ -48,6 +49,7 @@
         app:layout_constraintVertical_bias="0.0" />
 
     <Button
+        android:id="@+id/button3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="onBestenlisteClick"
@@ -58,5 +60,25 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0" />
+
+    <Button
+        android:id="@+id/testFinished"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="onGameFinished"
+        android:text="FINISH"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewGameScreen" />
+
+    <com.example.labyrinthapp.LabyrinthView
+        android:id="@+id/labyrinthView"
+        android:layout_width="400dp"
+        android:layout_height="300dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/button3" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
