@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private MemoryPersistence persistence = new MemoryPersistence();
     private MqttClient client;
     private String TAG = MainActivity.class.getSimpleName();
-    // die IP-Adresse bitte in SharedPreferences und über Menü änderbar
+    //TODO die IP-Adresse bitte in SharedPreferences (und über Menü änderbar)
     private String BROKER = "tcp://broker.emqx.io:1883";
     private SensorManager sensorManager;
     private Sensor gyroSensor;
@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private final long SENSOR_UPDATE_INTERVAL = 500; // Intervall in Millisekunden
     private EditText nameText;
     static private MainActivity instance;
+    //TODO falls Zeit, ingame sound
 
     public MainActivity() {
         if(instance == null)
