@@ -14,18 +14,24 @@ public class MqttHandler {
     private MqttClient client;
     private MemoryPersistence persistence = new MemoryPersistence();
     private int qos = 0;
+    private String broker = "x";
+
+    public void setBroker(String brokerAddress) {
+        broker = brokerAddress;
+    }
+
     /**
      * Connect to broker and
-     * @param broker Broker to connect to
      */
-    public void connect (String broker) {
+    public void connect () {
         //TODO toast anzeigen ob erfolgreich?
         try {
             clientId = MqttClient.generateClientId();
             client = new MqttClient(broker, clientId, persistence);
             MqttConnectOptions connOpts = new MqttConnectOptions();
-            //TODO maybe here crash?
+            //TODO maybe here crash (port falsch -> aufhängen)?
             connOpts.setCleanSession(true);
+            //connOpts.setConnectionTimeout(2000);
             Log.d("MQTT", "Connecting to broker: " + broker);
             client.connect(connOpts);
             Log.d("MQTT", "Connected with broker: " + broker);

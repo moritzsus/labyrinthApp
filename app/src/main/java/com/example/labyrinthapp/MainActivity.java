@@ -9,6 +9,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.media.tv.BroadcastInfoRequest;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -40,13 +41,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private String TAG = MainActivity.class.getSimpleName();
 
     //TODO change topics to M02
-    MqttHandler mqttHandler = new MqttHandler();
+    MqttHandler mqttHandler;
     private static final String mpu_sub_topic = "mpu/M03";
     private static final String temp_sub_topic = "temp/M03";
     private static final String pub_topic = "finished/M03";
     //TODO die IP-Adresse bitte in SharedPreferences (und über Menü änderbar)
     //TODO BROKER -> broker?
-    private String BROKER = "tcp://broker.emqx.io:1883";
+    private String BROKER = "tcp://broker.emx.io:1883";
     private EditText editTextBroker;
     private SensorManager sensorManager;
     private Sensor gyroSensor;
@@ -73,6 +74,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     .commit();
         }
 
+        mqttHandler = new MqttHandler();
+        mqttHandler.setBroker(BROKER);
         // Initialisiere den SensorManager
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
@@ -85,7 +88,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         super.onResume();
 
         if(inputMethod == InputMethodEnum.MPU6050) {
-            mqttHandler.connect(BROKER);
+            mqttHandler.connect();
             mqttHandler.subscribe(mpu_sub_topic);
             mqttHandler.subscribe(temp_sub_topic);
         }
@@ -162,14 +165,24 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public void onBrokerSaveClick(View view) {
         editTextBroker = findViewById(R.id.editTextBroker);
         BROKER = editTextBroker.getText().toString();
-        Log.d("SAVE", "SAVE: " + BROKER);
+        String test = editTextBroker.getText().toString();
+        boolean same = (test.equals(BROKER));
+        //TODO darf kein leerer String sein?
+        //TODO test wenn init broker wert ungültig
+        mqttHandler.setBroker(BROKER);
+        Log.d("SAVE", "TEST: " + test);
+        Log.d("SAVE", "BROKER: " + BROKER.length());
+        Log.d("SAVE", "SAME?: " + same);
 
          //connect to new broker if inputMehod is MPU - if not, checking the radio button will automatically connect to new broker
         if(inputMethod == InputMethodEnum.MPU6050) {
             //TODO fix crash when connecting to entered broker
             mqttHandler.disconnect(mpu_sub_topic, temp_sub_topic);
-
-            mqttHandler.connect(BROKER);
+            //mqttHandler = new MqttHandler();
+            //BROKER = "hshd";
+            //BROKER = "tcp://broker.emqx.io:1883";
+            mqttHandler.setBroker(BROKER);
+            mqttHandler.connect();
             mqttHandler.subscribe(mpu_sub_topic);
             mqttHandler.subscribe(temp_sub_topic);
         }
@@ -196,7 +209,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         if(inputMethod == InputMethodEnum.MPU6050) return;
 
         inputMethod = InputMethodEnum.MPU6050;
-        mqttHandler.connect(BROKER);
+        mqttHandler.connect();
         mqttHandler.subscribe(mpu_sub_topic);
         mqttHandler.subscribe(temp_sub_topic);
     }
