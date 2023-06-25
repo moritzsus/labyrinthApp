@@ -9,27 +9,27 @@ public class PlayerController {
     enum Direction {
         NONE, UP, DOWN, LEFT, RIGHT
     }
-    static PlayerController playerController;
+    static PlayerController instance;
     int playerPositionRow, playerPositionCol;
     Direction direction = Direction.NONE;
     private int[][] labyrinth;
     Paint playerPaint = new Paint(); // später zu sprite ändern
     LabyrinthView labyrinthView;
-    private float verticalDeazone = 0.2f;
+    private float verticalDeazone = 0.4f;
     private float horizontalDeazone = 0.5f;
     private int level = 1;
 
     public PlayerController() {
+        instance = this;
         playerPositionRow = 0;
         playerPositionCol = 1;
     }
 
     public static PlayerController getInstance() {
-        if(playerController == null) {
-            playerController = new PlayerController();
-            return playerController;
+        if(instance == null) {
+            return new PlayerController();
         }
-        return playerController;
+        return instance;
     }
 
     public void setLabyrinthView(LabyrinthView labyrinthView) {
@@ -45,6 +45,8 @@ public class PlayerController {
     public void setPlayerPaint(Paint paint) {
         playerPaint = paint;
     }
+
+    public void resetLevel() {level = 1;}
 
     // rotation values
     public void movePlayer(float x, float y) {
@@ -103,16 +105,16 @@ public class PlayerController {
         // Ziel
         if(playerPositionRow == labyrinth.length - 1 && playerPositionCol == labyrinth[0].length - 2) {
             if(level == 5) {
-                Log.d("Rotationswerte", "ALL FINISHED");
+                //TODO stop movement
                 MainActivity.getInstance().onGameFinished();
             }
             else {
-                //TODO erster frame bei neuem labyrinth ist player noch im ziel
-                Log.d("Rotationswerte", "Level " + level + " FINISHED");
+                //TODO erster frame bei neuem labyrinth ist player noch im ziel (erst im nächsten frame neues labyrinth?)
                 level++;
                 GameScreenFragment.getInstance().generateLabyrinth();
                 GameScreenFragment.getInstance().sendLabyrinthToView();
-                //TODO keep direction?
+                GameScreenFragment.getInstance().setLevel(level);
+                //TODO keep direction -> dann wäre erster tick spieler 1 weiter vorm startpunkt -> bool variable?
                 direction = Direction.NONE;
             }
         }

@@ -24,6 +24,12 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Timer;
+import java.util.TimerTask;
+
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
 
     public enum ScreenEnum {
@@ -47,7 +53,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private static final String pub_topic = "finished/M03";
     //TODO die IP-Adresse bitte in SharedPreferences (und über Menü änderbar)
     //TODO BROKER -> broker?
-    private String BROKER = "tcp://broker.emx.io:1883";
+    private String BROKER = "tcp://broker.emqx.io:1883";
     private EditText editTextBroker;
     private SensorManager sensorManager;
     private Sensor gyroSensor;
@@ -55,11 +61,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private final long SENSOR_UPDATE_INTERVAL = 500; // Intervall in Millisekunden
     private EditText nameText;
     static private MainActivity instance;
+    boolean firstSensorRead = true;
+    private Timer tempTimer;
+    private TimerTask tempTimerTask;
+    private boolean firstTempRead = true;
     //TODO falls Zeit, ingame sound
 
     public MainActivity() {
-        if(instance == null)
-            instance = this;
+        instance = this;
     }
 
     @Override
@@ -95,6 +104,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         if (gyroSensor != null) {
             sensorManager.registerListener(this, gyroSensor, SensorManager.SENSOR_DELAY_NORMAL);
         }
+        if(currentScreen == ScreenEnum.GAMESCREEN && inputMethod == InputMethodEnum.SMARTPHONESENSOR) {
+            if(tempTimer != null)
+                startTemperatureTimer();
+        }
     }
 
     @Override
@@ -105,6 +118,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             mqttHandler.disconnect(mpu_sub_topic, temp_sub_topic);
         }
         sensorManager.unregisterListener(this);
+
+        if(currentScreen == ScreenEnum.GAMESCREEN && inputMethod == InputMethodEnum.SMARTPHONESENSOR) {
+            if(tempTimer != null)
+                tempTimer.cancel();
+        }
     }
 
     public static MainActivity getInstance() {
@@ -132,6 +150,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 .addToBackStack(null)
                 .commit();
 
+        PlayerController.getInstance().resetLevel();
+
+        if(inputMethod == InputMethodEnum.SMARTPHONESENSOR) {
+            startTemperatureTimer();
+        }
         currentScreen = MainActivity.ScreenEnum.GAMESCREEN;
     }
 
@@ -141,6 +164,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 .replace(R.id.fragment_container_view, StartScreenFragment.class, null)
                 .addToBackStack(null)
                 .commit();
+
+        if(currentScreen == ScreenEnum.GAMESCREEN && inputMethod == InputMethodEnum.SMARTPHONESENSOR) {
+            if(tempTimer != null) {
+                tempTimer.cancel();
+                firstTempRead = true;
+            }
+        }
 
         //TODO fix or delete
         //String name = StartScreenFragment.getInstance().getNameString();
@@ -159,28 +189,26 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 .addToBackStack(null)
                 .commit();
 
+        if(currentScreen == ScreenEnum.GAMESCREEN && inputMethod == InputMethodEnum.SMARTPHONESENSOR) {
+            if(tempTimer != null)
+                tempTimer.cancel();
+        }
+
         currentScreen = ScreenEnum.SETTINGSSCREEN;
     }
 
     public void onBrokerSaveClick(View view) {
         editTextBroker = findViewById(R.id.editTextBroker);
         BROKER = editTextBroker.getText().toString();
-        String test = editTextBroker.getText().toString();
-        boolean same = (test.equals(BROKER));
         //TODO darf kein leerer String sein?
         //TODO test wenn init broker wert ungültig
         mqttHandler.setBroker(BROKER);
-        Log.d("SAVE", "TEST: " + test);
-        Log.d("SAVE", "BROKER: " + BROKER.length());
-        Log.d("SAVE", "SAME?: " + same);
 
          //connect to new broker if inputMehod is MPU - if not, checking the radio button will automatically connect to new broker
         if(inputMethod == InputMethodEnum.MPU6050) {
             //TODO fix crash when connecting to entered broker
             mqttHandler.disconnect(mpu_sub_topic, temp_sub_topic);
-            //mqttHandler = new MqttHandler();
-            //BROKER = "hshd";
-            //BROKER = "tcp://broker.emqx.io:1883";
+
             mqttHandler.setBroker(BROKER);
             mqttHandler.connect();
             mqttHandler.subscribe(mpu_sub_topic);
@@ -191,6 +219,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public void onCloseClick(View view) {
         currentScreen = lastScreen;
         getSupportFragmentManager().popBackStack();
+
+        if(currentScreen == ScreenEnum.GAMESCREEN && inputMethod == InputMethodEnum.SMARTPHONESENSOR) {
+            if(tempTimer != null)
+                startTemperatureTimer();
+        }
     }
 
     public void onBestenlisteClick(View view) {
@@ -201,6 +234,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 .add(R.id.fragment_container_view, BestenlisteFragment.class, null)
                 .addToBackStack(null)
                 .commit();
+
+        if(currentScreen == ScreenEnum.GAMESCREEN && inputMethod == InputMethodEnum.SMARTPHONESENSOR) {
+            if(tempTimer != null)
+                tempTimer.cancel();
+        }
 
         currentScreen = ScreenEnum.BESTENLISTESCREEN;
     }
@@ -222,31 +260,101 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     public void onGameFinished() {
-        mqttHandler.publish(pub_topic, "Game Finished");
+        //TODO only when MPU is connected -> crash
+        //TODO stop Timer
+        //TODO Bestenliste SQLite
+        //mqttHandler.publish(pub_topic, "Game Finished");
     }
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
         if(inputMethod == InputMethodEnum.MPU6050)
             return;
+
             // TODO falls Zeit accelerometer
         if(currentScreen == ScreenEnum.GAMESCREEN) {
             if (sensorEvent.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
                 long currentTime = System.currentTimeMillis();
                 // TODO falls Zeit, immer prüfen, nur alle 500ms an moveplayer schicken, damit bewegungen zwischen 2 ticks td erkannt werden (muss direction hier speichern?)
                 if (currentTime - lastSensorUpdate >= SENSOR_UPDATE_INTERVAL) {
+                    if(firstSensorRead) {
+                        firstSensorRead = false;
+                        return;
+                    }
                     float x = sensorEvent.values[0];
                     float y = sensorEvent.values[1];
 
                     PlayerController.getInstance().movePlayer(x, y);
+
                     lastSensorUpdate = currentTime;
                 }
             }
         }
     }
 
+    private float getCpuTemperature() {
+        Process process;
+        try {
+            process = Runtime.getRuntime().exec("cat sys/class/thermal/thermal_zone0/temp");
+            process.waitFor();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String line = reader.readLine();
+            float temp = Float.parseFloat(line) / 1000.0f;
+            Log.d("s", "CPU: " + temp);
+            reader.close();
+            return temp;
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
+        return -1.0f;
+    }
+
+    private void startTemperatureTimer() {
+        tempTimer = new Timer();
+        tempTimerTask = new TimerTask() {
+            @Override
+            public void run() {
+                if(firstTempRead) {
+                    firstTempRead = false;
+                    return;
+                }
+                float cpuTemp = getCpuTemperature();
+                String cpuTempStr = Float.toString(cpuTemp);
+                GameScreenFragment.getInstance().setTemperature(cpuTempStr);
+                GameScreenFragment.getInstance().increaseCounter();
+                GameScreenFragment.getInstance().setTimer();
+            }
+        };
+        tempTimer.schedule(tempTimerTask, 0, 1000);
+    }
+
+
+
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
         // Nicht benötigt, kann leer bleiben
+    }
+
+    /**
+     * Display data in a TextView with ID "textFeld"
+     * This has to be done with runOnUiThread
+     * @param data
+     */
+    public void displayStatus(TextView textView, String data) {
+        Thread t = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                                textView.setText(data);
+                            }
+                    });
+
+                } catch (Exception e) { }
+            }
+        };
+        t.start();
     }
 }

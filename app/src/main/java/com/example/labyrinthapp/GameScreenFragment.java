@@ -9,7 +9,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
+
+import org.w3c.dom.Text;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -17,13 +20,16 @@ import java.util.Collections;
 public class GameScreenFragment extends Fragment {
     View rootView;
     private LabyrinthView labyrinthView;
-    private int rows = 6;
-    private int cols = 6;
+    private TextView temperatureView;
+    private TextView timerView;
+    private TextView levelView;
+    private int timeCounter = 0;
+    private int rows = 2;
+    private int cols = 2;
     private int[][] labyrinth;
     static GameScreenFragment instance;
 
     public GameScreenFragment() {
-        Log.d("Rotationswerte", "GAMESCREEN CONSTRUCTOR");
         instance = this;
     }
 
@@ -42,6 +48,11 @@ public class GameScreenFragment extends Fragment {
         labyrinthView = rootView.findViewById(R.id.labyrinthView);
         generateLabyrinth();
         sendLabyrinthToView();
+
+        temperatureView = rootView.findViewById(R.id.textViewTemp);
+        timerView = rootView.findViewById(R.id.textViewTime);
+        levelView = rootView.findViewById(R.id.textViewLevel);
+
         return rootView;
     }
 
@@ -88,5 +99,26 @@ public class GameScreenFragment extends Fragment {
                 carvePassages(newRow, newCol);
             }
         }
+    }
+
+    public void setTemperature(String temperature) {
+        MainActivity.getInstance().displayStatus(temperatureView, temperature);
+    }
+    public void setTimer() {
+        //TODO correct time format (x.xx)
+        String timerStr = Integer.toString(timeCounter);
+
+        MainActivity.getInstance().displayStatus(timerView, timerStr);
+    }
+
+    public void setLevel(int level) {
+        String levelStr = Integer.toString(level);
+        MainActivity.getInstance().displayStatus(levelView, levelStr);
+    }
+
+    public void increaseCounter(){
+        timeCounter++;
+        // TODO in view anzeigen
+        Log.d("MQTT", "COUNTER: " + timeCounter);
     }
 }

@@ -1,6 +1,10 @@
 package com.example.labyrinthapp;
 
+import android.app.GameManager;
 import android.util.Log;
+import android.widget.TextView;
+
+import androidx.fragment.app.Fragment;
 
 import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
 import org.eclipse.paho.client.mqttv3.MqttClient;
@@ -15,6 +19,7 @@ public class MqttHandler {
     private MemoryPersistence persistence = new MemoryPersistence();
     private int qos = 0;
     private String broker = "x";
+    boolean firstMsg = true;
 
     public void setBroker(String brokerAddress) {
         broker = brokerAddress;
@@ -31,8 +36,8 @@ public class MqttHandler {
             MqttConnectOptions connOpts = new MqttConnectOptions();
             //TODO maybe here crash (port falsch -> aufhängen)?
             connOpts.setCleanSession(true);
-            //connOpts.setConnectionTimeout(2000);
             Log.d("MQTT", "Connecting to broker: " + broker);
+            connOpts.setConnectionTimeout(2000);
             client.connect(connOpts);
             Log.d("MQTT", "Connected with broker: " + broker);
         } catch (MqttException me) {
@@ -55,15 +60,29 @@ public class MqttHandler {
                 public void messageArrived(String topic, MqttMessage msg) throws Exception {
                     if(MainActivity.getInstance().getCurrentScreen() != MainActivity.ScreenEnum.GAMESCREEN)
                         return;
+
+                    if(firstMsg){
+                        firstMsg = false;
+                        return;
+                    }
                     String message = new String(msg.getPayload());
                     String[] values = message.split(",");
 
-                    // 6 sind bewegungssensoren, 2 temp und counter
+                    // length 6 = Bewegungssensordaten
                     if(values.length == 6) {
                         float x = Float.parseFloat(values[3]);
                         float y = Float.parseFloat(values[4]);
 
                         PlayerController.getInstance().movePlayer(x, y);
+                    }
+                    //length 2 = counter und Temperatur
+                    if(values.length == 2) {
+                        String temp = values[1].trim().substring(0, 4);
+
+                        GameScreenFragment gamescreen = GameScreenFragment.getInstance();
+                        gamescreen.setTemperature(temp);
+                        gamescreen.increaseCounter();
+                        gamescreen.setTimer();
                     }
                 }
             });
