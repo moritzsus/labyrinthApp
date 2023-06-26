@@ -47,6 +47,9 @@ public class PlayerController {
     }
 
     public void resetLevel() {level = 1;}
+    public int getLevel() {
+        return level;
+    }
 
     // rotation values
     public void movePlayer(float x, float y) {
@@ -104,9 +107,10 @@ public class PlayerController {
 
         // Ziel
         if(playerPositionRow == labyrinth.length - 1 && playerPositionCol == labyrinth[0].length - 2) {
-            if(level == 5) {
+            if(level == 2) {
                 //TODO stop movement
-                MainActivity.getInstance().onGameFinished();
+                if(!GameScreenFragment.getInstance().getGameFinished())
+                    MainActivity.getInstance().onGameFinished();
             }
             else {
                 //TODO erster frame bei neuem labyrinth ist player noch im ziel (erst im nächsten frame neues labyrinth?)

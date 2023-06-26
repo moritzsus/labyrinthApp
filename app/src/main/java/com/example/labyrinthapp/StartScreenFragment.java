@@ -15,7 +15,7 @@ public class StartScreenFragment extends Fragment {
     View rootview;
     private EditText editTextName;
     //TODO fix or delete2
-    private String name = "NAME";
+    private String playerName = "NAME";
     static StartScreenFragment instance;
 
     public StartScreenFragment() {
@@ -40,11 +40,11 @@ public class StartScreenFragment extends Fragment {
         return editTextName;
     }
 
-    public void setNameString(String name) {
-        this.name = name;
+    public void setPlayerName(String name) {
+        this.playerName = name;
     }
 
-    public String getNameString() {
-        return name;
+    public String getPlayerName() {
+        return playerName;
     }
 }

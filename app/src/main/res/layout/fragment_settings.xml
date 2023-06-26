@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:text="SETTINGS"
         android:textColor="@color/white"
-        android:textSize="35dp"
+        android:textSize="28dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -22,7 +22,6 @@
         app:layout_constraintVertical_bias="0.01999998" />
 
     <ImageButton
-        android:id="@+id/button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@color/backgroundColor"
@@ -41,7 +40,7 @@
         android:layout_height="wrap_content"
         android:text="Sound"
         android:textColor="@color/white"
-        android:textSize="26dp"
+        android:textSize="24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -67,7 +66,7 @@
         android:layout_height="wrap_content"
         android:text="Sensor Source"
         android:textColor="@color/white"
-        android:textSize="26dp"
+        android:textSize="24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -83,28 +82,28 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textViewSource"
-        app:layout_constraintVertical_bias="0.04000002">
+        app:layout_constraintVertical_bias="0.0">
 
         <RadioButton
             android:id="@+id/radioButtonSPSens"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="5dp"
             android:checked="true"
+            android:onClick="onSmartphoneSensorClick"
+            android:padding="5dp"
             android:text="Smartphone Sensors"
             android:textColor="@color/white"
-            android:textSize="16dp"
-            android:onClick="onSmartphoneSensorClick"/>
+            android:textSize="16dp" />
 
         <RadioButton
             android:id="@+id/radioButtonMpu"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:onClick="onMPUClick"
             android:padding="5dp"
             android:text="MPU6050"
             android:textColor="@color/white"
-            android:textSize="16dp"
-            android:onClick="onMPUClick" />
+            android:textSize="16dp" />
     </RadioGroup>
 
     <EditText

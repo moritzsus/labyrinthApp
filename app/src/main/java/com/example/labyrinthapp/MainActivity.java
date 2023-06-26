@@ -13,7 +13,9 @@ import android.media.tv.BroadcastInfoRequest;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
@@ -27,6 +29,7 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -59,13 +62,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private Sensor gyroSensor;
     private long lastSensorUpdate = 0;
     private final long SENSOR_UPDATE_INTERVAL = 500; // Intervall in Millisekunden
-    private EditText nameText;
     static private MainActivity instance;
     boolean firstSensorRead = true;
     private Timer tempTimer;
     private TimerTask tempTimerTask;
     private boolean firstTempRead = true;
     //TODO falls Zeit, ingame sound
+    //TODO alle Fragment singletons in oncreate abspeichern -> kann views erstellen
 
     public MainActivity() {
         instance = this;
@@ -142,7 +145,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         if(nametxt.length() == 0) {
             return;
         }
-        StartScreenFragment.getInstance().setNameString(nametxt);
+        StartScreenFragment.getInstance().setPlayerName(nametxt);
 
         getSupportFragmentManager().beginTransaction()
                 .setReorderingAllowed(true)
@@ -151,6 +154,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 .commit();
 
         PlayerController.getInstance().resetLevel();
+        GameScreenFragment.getInstance().setGameFinished(false);
 
         if(inputMethod == InputMethodEnum.SMARTPHONESENSOR) {
             startTemperatureTimer();
@@ -264,6 +268,19 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         //TODO stop Timer
         //TODO Bestenliste SQLite
         //mqttHandler.publish(pub_topic, "Game Finished");
+
+        GameScreenFragment.getInstance().setGameFinished(true);
+
+        SQLiteHandler sqLiteHandler = new SQLiteHandler(this);
+
+        String name = StartScreenFragment.getInstance().getPlayerName();
+        Log.d("NAME", "NAME: " + name);
+
+        //TODO error handling?
+        boolean success = sqLiteHandler.addPlayer(name, PlayerController.getInstance().getLevel(), GameScreenFragment.getInstance().getTime());
+        onBestenlisteClick(null);
+
+        //TODO delay before leaderboard open?
     }
 
     @Override

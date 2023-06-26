@@ -24,6 +24,7 @@ public class GameScreenFragment extends Fragment {
     private TextView timerView;
     private TextView levelView;
     private int timeCounter = 0;
+    private boolean gameFinished = false;
     private int rows = 2;
     private int cols = 2;
     private int[][] labyrinth;
@@ -106,9 +107,10 @@ public class GameScreenFragment extends Fragment {
     }
     public void setTimer() {
         //TODO correct time format (x.xx)
-        String timerStr = Integer.toString(timeCounter);
-
-        MainActivity.getInstance().displayStatus(timerView, timerStr);
+        if(!gameFinished) {
+            String timerStr = Integer.toString(timeCounter);
+            MainActivity.getInstance().displayStatus(timerView, timerStr);
+        }
     }
 
     public void setLevel(int level) {
@@ -117,8 +119,21 @@ public class GameScreenFragment extends Fragment {
     }
 
     public void increaseCounter(){
-        timeCounter++;
-        // TODO in view anzeigen
-        Log.d("MQTT", "COUNTER: " + timeCounter);
+        if(!gameFinished) {
+            timeCounter++;
+            Log.d("MQTT", "COUNTER: " + timeCounter);
+        }
+    }
+
+    public void setGameFinished(boolean finished) {
+        gameFinished = finished;
+    }
+
+    public boolean getGameFinished() {
+        return gameFinished;
+    }
+
+    public int getTime() {
+        return timeCounter;
     }
 }

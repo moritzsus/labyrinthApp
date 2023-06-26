@@ -4,32 +4,44 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".SettingsFragment">
+    tools:context=".SettingsFragment"
+    android:background="@color/backgroundColor">
 
     <TextView
-        android:id="@+id/textViewBestenliste"
+        android:id="@+id/textViewLeaderboard"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@color/design_default_color_error"
-        android:text="BESTENLISTE"
-        android:textSize="35dp"
+        android:text="LEADERBOARD"
+        android:textColor="@color/white"
+        android:textSize="28dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.060000002" />
+        app:layout_constraintVertical_bias="0.01999998" />
 
-    <Button
+    <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="@color/backgroundColor"
         android:onClick="onCloseClick"
+        android:src="@drawable/icon_close"
         android:text="X"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.08"
+        app:layout_constraintEnd_toStartOf="@+id/textViewLeaderboard"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.52" />
+        app:layout_constraintVertical_bias="0.01999998" />
+
+    <ListView
+        android:id="@+id/listViewLeaderboard"
+        android:layout_width="380dp"
+        android:layout_height="500dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewLeaderboard"
+        app:layout_constraintVertical_bias="0.25" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
