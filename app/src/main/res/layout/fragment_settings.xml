@@ -4,57 +4,139 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".SettingsFragment">
+    tools:context=".SettingsFragment"
+    android:background="@color/backgroundColor">
 
     <TextView
         android:id="@+id/textViewSettings"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@color/design_default_color_error"
         android:text="SETTINGS"
-        android:textSize="35dp"
+        android:textColor="@color/white"
+        android:textSize="28dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.060000002" />
+        app:layout_constraintVertical_bias="0.01999998" />
 
-    <Button
-        android:id="@+id/button"
+    <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="@color/backgroundColor"
         android:onClick="onCloseClick"
+        android:src="@drawable/icon_close"
         android:text="X"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.08"
+        app:layout_constraintEnd_toStartOf="@+id/textViewSettings"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.52" />
+        app:layout_constraintVertical_bias="0.01999998" />
 
-    <Button
-        android:id="@+id/button2"
+    <TextView
+        android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="onMPUClick"
-        android:text="MPU"
-        app:layout_constraintBottom_toTopOf="@+id/button"
+        android:text="Sound"
+        android:textColor="@color/white"
+        android:textSize="24dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.08"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/textViewSettings"
+        app:layout_constraintVertical_bias="0.060000002" />
 
-    <Button
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/soundSwitch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="onSDClick"
-        android:text="SD"
-        app:layout_constraintBottom_toTopOf="@+id/button"
+        android:scaleX="1.2"
+        android:scaleY="1.2"
+        android:checked="true"
+        android:onClick="onSwitchSound"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.662"
-        app:layout_constraintStart_toEndOf="@+id/button2"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.524" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView2"
+        app:layout_constraintVertical_bias="0.00999999"
+        app:thumbTint="@color/white" />
+
+    <TextView
+        android:id="@+id/textViewSource"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Sensor Source"
+        android:textColor="@color/white"
+        android:textSize="24dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/soundSwitch"
+        app:layout_constraintVertical_bias="0.060000002" />
+
+    <RadioGroup
+        android:id="@+id/radioGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewSource"
+        app:layout_constraintVertical_bias="0.0">
+
+        <RadioButton
+            android:id="@+id/radioButtonSPSens"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:onClick="onSmartphoneSensorClick"
+            android:padding="5dp"
+            android:text="Smartphone Sensors"
+            android:textColor="@color/white"
+            android:textSize="16dp" />
+
+        <RadioButton
+            android:id="@+id/radioButtonMpu"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="onMPUClick"
+            android:padding="5dp"
+            android:text="MPU6050"
+            android:textColor="@color/white"
+            android:textSize="16dp" />
+    </RadioGroup>
+
+    <EditText
+        android:id="@+id/editTextBroker"
+        android:layout_width="wrap_content"
+        android:layout_height="35dp"
+        android:background="@drawable/rounded_edittext_background"
+        android:ems="10"
+        android:hint="Broker Address"
+        android:inputType="text"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:textColor="@color/black"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/radioGroup"
+        app:layout_constraintVertical_bias="0.01999998" />
+
+    <Button
+        android:id="@+id/buttonSave"
+        android:layout_width="70dp"
+        android:layout_height="40dp"
+        android:padding="0dp"
+        android:backgroundTint="@color/design_default_color_error"
+        android:text="Save"
+        android:onClick="onBrokerSaveClick"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editTextBroker"
+        app:layout_constraintVertical_bias="0.04000002" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

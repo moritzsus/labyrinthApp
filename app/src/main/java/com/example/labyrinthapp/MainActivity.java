@@ -9,9 +9,16 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.media.MediaPlayer;
+import android.media.tv.BroadcastInfoRequest;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.RadioButton;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
@@ -21,39 +28,54 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
 
     public enum ScreenEnum {
         STARTSCREEN, GAMESCREEN, SETTINGSSCREEN, BESTENLISTESCREEN
+        //TODO renam bestenlsite?
     }
-    ScreenEnum currentScreen;
+    ScreenEnum currentScreen = ScreenEnum.STARTSCREEN;;
+    //TODO lastScreen löschen?
     ScreenEnum lastScreen;
 
-    private enum InputMethodEnum {
+    public enum InputMethodEnum {
         MPU6050, SMARTPHONESENSOR
     }
-    InputMethodEnum inputMethod;
+    InputMethodEnum inputMethod = InputMethodEnum.SMARTPHONESENSOR;;
+    private String TAG = MainActivity.class.getSimpleName();
 
+    //TODO change topics to M02
+    MqttHandler mqttHandler;
     private static final String mpu_sub_topic = "mpu/M03";
     private static final String temp_sub_topic = "temp/M03";
     private static final String pub_topic = "finished/M03";
-    private int qos = 0;
-    private String clientId;
-    private MemoryPersistence persistence = new MemoryPersistence();
-    private MqttClient client;
-    private String TAG = MainActivity.class.getSimpleName();
-    // die IP-Adresse bitte in SharedPreferences und über Menü änderbar
+    //TODO die IP-Adresse bitte in SharedPreferences (und über Menü änderbar)
+    //TODO BROKER -> broker?
     private String BROKER = "tcp://broker.emqx.io:1883";
+    private EditText editTextBroker;
     private SensorManager sensorManager;
     private Sensor gyroSensor;
     private long lastSensorUpdate = 0;
     private final long SENSOR_UPDATE_INTERVAL = 500; // Intervall in Millisekunden
     static private MainActivity instance;
+    boolean firstSensorRead = true;
+    private Timer tempTimer;
+    private TimerTask tempTimerTask;
+
+    private boolean soundOn = true;
+    private boolean firstTempRead = true;
+    //TODO falls Zeit, ingame sound
+    //TODO alle Fragment singletons in oncreate abspeichern -> kann views erstellen
 
     public MainActivity() {
-        if(instance == null)
-            instance = this;
+        instance = this;
     }
 
     @Override
@@ -61,28 +83,21 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Log.d(TAG, "First ONCREATE");
-
         if(savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
                     .setReorderingAllowed(true)
+                    // hereadd
                     .add(R.id.fragment_container_view, StartScreenFragment.class, null)
                     .commit();
         }
-        currentScreen = ScreenEnum.STARTSCREEN;
-        inputMethod = InputMethodEnum.MPU6050;
 
+        mqttHandler = new MqttHandler();
+        mqttHandler.setBroker(BROKER);
         // Initialisiere den SensorManager
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
         // Überprüfe, ob das Gerät einen Rotationssensor hat
         gyroSensor = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
-
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
     }
 
     @Override
@@ -90,12 +105,16 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         super.onResume();
 
         if(inputMethod == InputMethodEnum.MPU6050) {
-            connect(BROKER);
-            subscribe(mpu_sub_topic);
-            subscribe(temp_sub_topic);
+            mqttHandler.connect();
+            mqttHandler.subscribe(mpu_sub_topic);
+            mqttHandler.subscribe(temp_sub_topic);
         }
         if (gyroSensor != null) {
             sensorManager.registerListener(this, gyroSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        }
+        if(currentScreen == ScreenEnum.GAMESCREEN && inputMethod == InputMethodEnum.SMARTPHONESENSOR) {
+            if(tempTimer != null)
+                startTemperatureTimer();
         }
     }
 
@@ -104,9 +123,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         //TODO Handydaten Pausieren/resumen
         super.onPause();
         if(inputMethod == InputMethodEnum.MPU6050) {
-            disconnect(mpu_sub_topic, temp_sub_topic);
+            mqttHandler.disconnect(mpu_sub_topic, temp_sub_topic);
         }
         sensorManager.unregisterListener(this);
+
+        if(currentScreen == ScreenEnum.GAMESCREEN && inputMethod == InputMethodEnum.SMARTPHONESENSOR) {
+            if(tempTimer != null)
+                tempTimer.cancel();
+        }
     }
 
     public static MainActivity getInstance() {
@@ -118,52 +142,136 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public ScreenEnum getCurrentScreen() {
         return currentScreen;
     }
+    public InputMethodEnum getInputMethod() { return inputMethod; }
 
     public void onPlayButtonClick(View view) {
+        EditText name = StartScreenFragment.getInstance().getNameEditText();
+        String nametxt = name.getText().toString();
+        if(nametxt.length() == 0) {
+            return;
+        }
+        StartScreenFragment.getInstance().setPlayerName(nametxt);
+
         getSupportFragmentManager().beginTransaction()
                 .setReorderingAllowed(true)
                 .replace(R.id.fragment_container_view, GameScreenFragment.class, null)
                 .addToBackStack(null)
                 .commit();
 
+        PlayerController.getInstance().resetLevel();
+        GameScreenFragment.getInstance().setGameFinished(false);
+
+        if(inputMethod == InputMethodEnum.SMARTPHONESENSOR) {
+            startTemperatureTimer();
+        }
+
         currentScreen = MainActivity.ScreenEnum.GAMESCREEN;
     }
 
     public void onHomeButtonClick(View view) {
+        if(currentScreen != ScreenEnum.GAMESCREEN)
+            return;
+
         getSupportFragmentManager().beginTransaction()
                 .setReorderingAllowed(true)
                 .replace(R.id.fragment_container_view, StartScreenFragment.class, null)
                 .addToBackStack(null)
                 .commit();
 
+        if(currentScreen == ScreenEnum.GAMESCREEN && inputMethod == InputMethodEnum.SMARTPHONESENSOR) {
+            if(tempTimer != null) {
+                tempTimer.cancel();
+                firstTempRead = true;
+            }
+        }
+
+        //TODO fix or delete
+        //String name = StartScreenFragment.getInstance().getNameString();
+        //Log.d("...", "NAME: " + name);
+        //EditText nameEditText = StartScreenFragment.getInstance().getNameEditText();
+        //nameEditText.setText("TESTNAME");
         currentScreen = ScreenEnum.STARTSCREEN;
     }
 
     public void onSettingsClick(View view) {
+        if(currentScreen == ScreenEnum.SETTINGSSCREEN || currentScreen == ScreenEnum.BESTENLISTESCREEN)
+            return;
+
         lastScreen = currentScreen;
 
         getSupportFragmentManager().beginTransaction()
                 .setReorderingAllowed(true)
+                //hereadd
                 .add(R.id.fragment_container_view, SettingsFragment.class, null)
                 .addToBackStack(null)
                 .commit();
 
+        if(currentScreen == ScreenEnum.GAMESCREEN && inputMethod == InputMethodEnum.SMARTPHONESENSOR) {
+            if(tempTimer != null)
+                tempTimer.cancel();
+        }
+
         currentScreen = ScreenEnum.SETTINGSSCREEN;
+    }
+
+    public void onSwitchSound(View view) {
+        soundOn = !soundOn;
+
+        GameScreenFragment.getInstance().checkIfMusicPlay();
+    }
+
+    public void onBrokerSaveClick(View view) {
+        try {
+            editTextBroker = findViewById(R.id.editTextBroker);
+            BROKER = editTextBroker.getText().toString();
+            //TODO darf kein leerer String sein?
+            //TODO test wenn init broker wert ungültig
+            mqttHandler.setBroker(BROKER);
+
+            //connect to new broker if inputMehod is MPU - if not, checking the radio button will automatically connect to new broker
+            if(inputMethod == InputMethodEnum.MPU6050) {
+                //TODO fix crash when connecting to entered broker
+                mqttHandler.disconnect(mpu_sub_topic, temp_sub_topic);
+
+                mqttHandler.setBroker(BROKER);
+                mqttHandler.connect();
+                mqttHandler.subscribe(mpu_sub_topic);
+                mqttHandler.subscribe(temp_sub_topic);
+            }
+        }
+        catch (Exception e) {
+            Log.d("d", "CANNOT CONNECT TO BROKER");
+        }
+
     }
 
     public void onCloseClick(View view) {
         currentScreen = lastScreen;
         getSupportFragmentManager().popBackStack();
+
+        if(currentScreen == ScreenEnum.GAMESCREEN && inputMethod == InputMethodEnum.SMARTPHONESENSOR) {
+            if(tempTimer != null)
+                startTemperatureTimer();
+        }
     }
 
     public void onBestenlisteClick(View view) {
+        if(currentScreen == ScreenEnum.SETTINGSSCREEN || currentScreen == ScreenEnum.BESTENLISTESCREEN)
+            return;
+
         lastScreen = currentScreen;
 
         getSupportFragmentManager().beginTransaction()
                 .setReorderingAllowed(true)
+                //hereadd
                 .add(R.id.fragment_container_view, BestenlisteFragment.class, null)
                 .addToBackStack(null)
                 .commit();
+
+        if(currentScreen == ScreenEnum.GAMESCREEN && inputMethod == InputMethodEnum.SMARTPHONESENSOR) {
+            if(tempTimer != null)
+                tempTimer.cancel();
+        }
 
         currentScreen = ScreenEnum.BESTENLISTESCREEN;
     }
@@ -172,132 +280,149 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         if(inputMethod == InputMethodEnum.MPU6050) return;
 
         inputMethod = InputMethodEnum.MPU6050;
-        connect(BROKER);
-        subscribe(mpu_sub_topic);
-        subscribe(temp_sub_topic);
+        mqttHandler.connect();
+        mqttHandler.subscribe(mpu_sub_topic);
+        mqttHandler.subscribe(temp_sub_topic);
     }
 
-    public void onSDClick(View view) {
+    public void onSmartphoneSensorClick(View view) {
         if(inputMethod == InputMethodEnum.SMARTPHONESENSOR) return;
 
         inputMethod = InputMethodEnum.SMARTPHONESENSOR;
-        disconnect(mpu_sub_topic, temp_sub_topic);
+        mqttHandler.disconnect(mpu_sub_topic, temp_sub_topic);
     }
 
-    public void onGameFinished(View view) {
-        publish(pub_topic, "Game Finished");
-    }
+    public void onGameFinished() {
+        //TODO only when MPU is connected -> crash
+        //TODO stop Timer
+        //TODO Bestenliste SQLite
+        //mqttHandler.publish(pub_topic, "Game Finished");
 
-    /**
-     * Connect to broker and
-     * @param broker Broker to connect to
-     */
-    private void connect (String broker) {
-        try {
-            clientId = MqttClient.generateClientId();
-            client = new MqttClient(broker, clientId, persistence);
-            MqttConnectOptions connOpts = new MqttConnectOptions();
-            connOpts.setCleanSession(true);
-            Log.d(TAG, "Connecting to broker: " + broker);
-            client.connect(connOpts);
-            Log.d(TAG, "Connected with broker: " + broker);
-        } catch (MqttException me) {
-            Log.e(TAG, "Reason: " + me.getReasonCode());
-            Log.e(TAG, "Message: " + me.getMessage());
-            Log.e(TAG, "localizedMsg: " + me.getLocalizedMessage());
-            Log.e(TAG, "cause: " + me.getCause());
-            Log.e(TAG, "exception: " + me);
-        }
-    }
+        GameScreenFragment.getInstance().setGameFinished(true);
 
-    /**
-     * Subscribes to a given topic
-     * @param topic Topic to subscribe to
-     */
-    private void subscribe(String topic) {
-        try {
-            client.subscribe(topic, qos, new IMqttMessageListener() {
-                @Override
-                public void messageArrived(String topic, MqttMessage msg) throws Exception {
-                    if(currentScreen != ScreenEnum.GAMESCREEN)
-                        return;
-                    String message = new String(msg.getPayload());
-                    String[] values = message.split(",");
+        SQLiteHandler sqLiteHandler = new SQLiteHandler(this);
 
-                    // 6 sind bewegungssensoren, 2 temp und counter
-                    if(values.length == 6) {
-                        float x = Float.parseFloat(values[3]);
-                        float y = Float.parseFloat(values[4]);
+        String name = StartScreenFragment.getInstance().getPlayerName();
+        Log.d("NAME", "NAME: " + name);
 
-                        PlayerController.getInstance().movePlayer(x, y);
-                    }
-                }
-            });
-            Log.d(TAG, "subscribed to topic " + topic);
-        } catch (MqttException e) {
-            e.printStackTrace();
-        }
-    }
+        //TODO error handling?
+        boolean success = sqLiteHandler.addPlayer(name, PlayerController.getInstance().getLevel(), GameScreenFragment.getInstance().getTime());
+        onBestenlisteClick(null);
 
-    /**
-     * Unsubscribe from default topic (please unsubscribe from further
-     * topics prior to calling this function)
-     */
-    private void disconnect(String mpu_topic, String temp_topic) {
-        try {
-            client.unsubscribe(mpu_topic);
-            client.unsubscribe(temp_topic);
-        } catch (MqttException e) {
-            e.printStackTrace();
-            Log.e(TAG, e.getMessage());
-        }
-        try {
-            Log.d(TAG, "Disconnecting from broker");
-            client.disconnect();
-            Log.d(TAG, "Disconnected.");
-        } catch (MqttException me) {
-            Log.e(TAG, me.getMessage());
-        }
-    }
-
-    /**
-     * Publishes a message via MQTT (with fixed topic)
-     * @param topic topic to publish with
-     * @param msg message to publish with publish topic
-     */
-    private void publish(String topic, String msg) {
-        MqttMessage message = new MqttMessage(msg.getBytes());
-        message.setQos(qos);
-        try {
-            client.publish(topic, message);
-            Log.d(TAG, "PUBLISHED FINISH");
-        } catch (MqttException e) {
-            e.printStackTrace();
-        }
+        //TODO delay before leaderboard open?
     }
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
-        if(inputMethod == InputMethodEnum.MPU6050)
+        if(inputMethod == InputMethodEnum.MPU6050 || GameScreenFragment.getInstance().getGameFinished())
             return;
 
+            // TODO falls Zeit accelerometer
         if(currentScreen == ScreenEnum.GAMESCREEN) {
             if (sensorEvent.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
                 long currentTime = System.currentTimeMillis();
                 // TODO falls Zeit, immer prüfen, nur alle 500ms an moveplayer schicken, damit bewegungen zwischen 2 ticks td erkannt werden (muss direction hier speichern?)
                 if (currentTime - lastSensorUpdate >= SENSOR_UPDATE_INTERVAL) {
+                    if(firstSensorRead) {
+                        firstSensorRead = false;
+                        return;
+                    }
                     float x = sensorEvent.values[0];
                     float y = sensorEvent.values[1];
 
                     PlayerController.getInstance().movePlayer(x, y);
+
                     lastSensorUpdate = currentTime;
                 }
             }
         }
     }
 
+    private float getCpuTemperature() {
+        Process process;
+        try {
+            process = Runtime.getRuntime().exec("cat sys/class/thermal/thermal_zone0/temp");
+            process.waitFor();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String line = reader.readLine();
+            //TODO geht nicht auf simulator -> try catch?
+            float temp = Float.parseFloat(line) / 1000.0f;
+            Log.d("s", "CPU: " + temp);
+            reader.close();
+            return temp;
+        } catch (Exception e) {
+            Log.d("s", "Catch");
+            e.printStackTrace();
+        }
+        return 0.0f;
+    }
+
+    private void startTemperatureTimer() {
+        tempTimer = new Timer();
+        tempTimerTask = new TimerTask() {
+            @Override
+            public void run() {
+                if(firstTempRead) {
+                    firstTempRead = false;
+                    return;
+                }
+                float cpuTemp = getCpuTemperature();
+                String cpuTempStr = Float.toString(cpuTemp);
+                GameScreenFragment.getInstance().setTemperature(cpuTempStr);
+                GameScreenFragment.getInstance().increaseCounter();
+                GameScreenFragment.getInstance().setTimer();
+            }
+        };
+        tempTimer.schedule(tempTimerTask, 0, 1000);
+    }
+
+
+
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
         // Nicht benötigt, kann leer bleiben
     }
+
+    /**
+     * Display data in a TextView with ID "textFeld"
+     * This has to be done with runOnUiThread
+     * @param data
+     */
+    public void displayStatus(TextView textView, String data) {
+        Thread t = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                                textView.setText(data);
+                            }
+                    });
+
+                } catch (Exception e) { }
+            }
+        };
+        t.start();
+    }
+
+    public void playConnectionSound() {
+        if(!soundOn)
+            return;
+
+        MediaPlayer music = GameScreenFragment.getInstance().getBackgroundMusicMediaPlayer();
+        music.setVolume(0.2f, 0.2f);
+
+        MediaPlayer mp = MediaPlayer.create(this, R.raw.connection);
+        mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mediaPlayer) {
+                music.setVolume(0.6f, 0.6f);
+                mp.release();
+            }
+        });
+        mp.start();
+    }
+
+    public boolean getSoundOn() {return soundOn;}
 }
