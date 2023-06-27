@@ -29,7 +29,10 @@ public class SettingsFragment extends Fragment {
             smartphonesensor.setChecked(false);
             mpu.setChecked(true);
         }
-
+        //TODO broker adresse mit ip einstellbar
+        //TODO disable edittext when not mpu
+        // verhindert durchklicken auf darunterliegendes Fragment
+        rootview.requestFocus();
         return rootview;
     }
 }

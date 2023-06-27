@@ -25,8 +25,8 @@ public class GameScreenFragment extends Fragment {
     private TextView levelView;
     private int timeCounter = 0;
     private boolean gameFinished = false;
-    private int rows = 2;
-    private int cols = 2;
+    private int rows = 8;
+    private int cols = 8;
     private int[][] labyrinth;
     static GameScreenFragment instance;
 

@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private SensorManager sensorManager;
     private Sensor gyroSensor;
     private long lastSensorUpdate = 0;
-    private final long SENSOR_UPDATE_INTERVAL = 500; // Intervall in Millisekunden
+    private final long SENSOR_UPDATE_INTERVAL = 250; // Intervall in Millisekunden
     static private MainActivity instance;
     boolean firstSensorRead = true;
     private Timer tempTimer;
@@ -82,6 +82,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         if(savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
                     .setReorderingAllowed(true)
+                    // hereadd
                     .add(R.id.fragment_container_view, StartScreenFragment.class, null)
                     .commit();
         }
@@ -163,6 +164,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     public void onHomeButtonClick(View view) {
+        if(currentScreen != ScreenEnum.GAMESCREEN)
+            return;
+
         getSupportFragmentManager().beginTransaction()
                 .setReorderingAllowed(true)
                 .replace(R.id.fragment_container_view, StartScreenFragment.class, null)
@@ -185,10 +189,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     public void onSettingsClick(View view) {
+        if(currentScreen == ScreenEnum.SETTINGSSCREEN || currentScreen == ScreenEnum.BESTENLISTESCREEN)
+            return;
+
         lastScreen = currentScreen;
 
         getSupportFragmentManager().beginTransaction()
                 .setReorderingAllowed(true)
+                //hereadd
                 .add(R.id.fragment_container_view, SettingsFragment.class, null)
                 .addToBackStack(null)
                 .commit();
@@ -202,22 +210,28 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     public void onBrokerSaveClick(View view) {
-        editTextBroker = findViewById(R.id.editTextBroker);
-        BROKER = editTextBroker.getText().toString();
-        //TODO darf kein leerer String sein?
-        //TODO test wenn init broker wert ungültig
-        mqttHandler.setBroker(BROKER);
-
-         //connect to new broker if inputMehod is MPU - if not, checking the radio button will automatically connect to new broker
-        if(inputMethod == InputMethodEnum.MPU6050) {
-            //TODO fix crash when connecting to entered broker
-            mqttHandler.disconnect(mpu_sub_topic, temp_sub_topic);
-
+        try {
+            editTextBroker = findViewById(R.id.editTextBroker);
+            BROKER = editTextBroker.getText().toString();
+            //TODO darf kein leerer String sein?
+            //TODO test wenn init broker wert ungültig
             mqttHandler.setBroker(BROKER);
-            mqttHandler.connect();
-            mqttHandler.subscribe(mpu_sub_topic);
-            mqttHandler.subscribe(temp_sub_topic);
+
+            //connect to new broker if inputMehod is MPU - if not, checking the radio button will automatically connect to new broker
+            if(inputMethod == InputMethodEnum.MPU6050) {
+                //TODO fix crash when connecting to entered broker
+                mqttHandler.disconnect(mpu_sub_topic, temp_sub_topic);
+
+                mqttHandler.setBroker(BROKER);
+                mqttHandler.connect();
+                mqttHandler.subscribe(mpu_sub_topic);
+                mqttHandler.subscribe(temp_sub_topic);
+            }
         }
+        catch (Exception e) {
+            Log.d("d", "CANNOT CONNECT TO BROKER");
+        }
+
     }
 
     public void onCloseClick(View view) {
@@ -231,10 +245,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     public void onBestenlisteClick(View view) {
+        if(currentScreen == ScreenEnum.SETTINGSSCREEN || currentScreen == ScreenEnum.BESTENLISTESCREEN)
+            return;
+
         lastScreen = currentScreen;
 
         getSupportFragmentManager().beginTransaction()
                 .setReorderingAllowed(true)
+                //hereadd
                 .add(R.id.fragment_container_view, BestenlisteFragment.class, null)
                 .addToBackStack(null)
                 .commit();
@@ -316,14 +334,16 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             process.waitFor();
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String line = reader.readLine();
+            //TODO geht nicht auf simulator -> try catch?
             float temp = Float.parseFloat(line) / 1000.0f;
             Log.d("s", "CPU: " + temp);
             reader.close();
             return temp;
-        } catch (IOException | InterruptedException e) {
+        } catch (Exception e) {
+            Log.d("s", "Catch");
             e.printStackTrace();
         }
-        return -1.0f;
+        return 0.0f;
     }
 
     private void startTemperatureTimer() {

@@ -46,7 +46,8 @@ public class BestenlisteFragment extends Fragment {
         else {
             listViewLastRun.setVisibility(View.INVISIBLE);
         }
-
+        // verhindert durchklicken auf darunterliegendes Fragment
+        rootview.requestFocus();
         displayLeaderboard();
         return rootview;
     }

@@ -17,6 +17,7 @@ public class PlayerController {
     private float verticalDeazone = 0.4f;
     private float horizontalDeazone = 0.5f;
     private int level = 1;
+    private boolean skipPlayerMove = false;
 
     public PlayerController() {
         instance = this;
@@ -70,6 +71,11 @@ public class PlayerController {
 
         // set direction depending on the flags
         determineDirection(up, down, left, right);
+
+        // doppelt so oft lagesensor input wie movement
+        skipPlayerMove = !skipPlayerMove;
+        if(skipPlayerMove)
+            return;
 
         switch (direction) {
             case UP:
