@@ -84,4 +84,25 @@ public class SQLiteHandler extends SQLiteOpenHelper {
 
         return topPlayers;
     }
+
+    public int getPlayerPosition(Player player) {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // Erstelle eine Abfrage, um die Position des Spielers zu ermitteln
+        String query = "SELECT COUNT(*) + 1 AS position " +
+                "FROM " + LEADERBOARD_TABLE + " " +
+                "WHERE " + COLUMN_LEVEL + " > ? OR (" + COLUMN_LEVEL + " = ? AND " + COLUMN_TIME + " < ?)";
+
+        Cursor cursor = db.rawQuery(query, new String[] {String.valueOf(player.getLevel()), String.valueOf(player.getLevel()), String.valueOf(player.getTime())});
+
+        int position = 0;
+        if (cursor.moveToFirst()) {
+            position = cursor.getInt(cursor.getColumnIndexOrThrow("position"));
+        }
+
+        cursor.close();
+        db.close();
+
+        return position;
+    }
 }

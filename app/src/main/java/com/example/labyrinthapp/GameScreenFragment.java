@@ -74,16 +74,17 @@ public class GameScreenFragment extends Fragment {
         for (int i = 0; i < expandedRows; i++) {
             Arrays.fill(labyrinth[i], 1);
         }
-
-        labyrinth[0][1] = 0;
-        labyrinth[expandedRows - 1][expandedCols - 2] = 0;
+        // start und ziel setzzen
+        // TODO 0, 1, 2 als enum?
+        labyrinth[0][1] = 2;
+        labyrinth[expandedRows - 1][expandedCols - 2] = 2;
 
         // Erzeuge ein Labyrinth im inneren Bereich
         labyrinth[1][1] = 0;
         carvePassages(1, 1);
 
-        // Setze das Ziel
-        labyrinth[expandedRows - 2][expandedCols - 2] = 0;
+        // Setze das Ziel (wird oben schon gemacht?)
+        //labyrinth[expandedRows - 2][expandedCols - 2] = 0;
     }
 
     private void carvePassages(int row, int col) {

@@ -6,6 +6,13 @@
     android:padding="8dp">
 
     <TextView
+        android:id="@+id/lv_positionTextView"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <TextView
         android:id="@+id/lv_nameTextView"
         android:layout_width="0dp"
         android:layout_weight="1"
@@ -15,14 +22,20 @@
 
     <TextView
         android:id="@+id/lv_levelTextView"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:textStyle="bold"
         android:layout_height="wrap_content"
-        android:textSize="14sp" />
+        android:textAlignment="center"
+        android:textSize="16sp" />
 
     <TextView
         android:id="@+id/lv_timeTextView"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="1"
         android:layout_height="wrap_content"
-        android:textSize="14sp" />
+        android:textStyle="bold"
+        android:textAlignment="center"
+        android:textSize="16sp" />
 
 </LinearLayout>

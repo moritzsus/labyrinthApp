@@ -285,7 +285,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
-        if(inputMethod == InputMethodEnum.MPU6050)
+        if(inputMethod == InputMethodEnum.MPU6050 || GameScreenFragment.getInstance().getGameFinished())
             return;
 
             // TODO falls Zeit accelerometer

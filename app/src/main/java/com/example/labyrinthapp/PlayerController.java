@@ -13,7 +13,6 @@ public class PlayerController {
     int playerPositionRow, playerPositionCol;
     Direction direction = Direction.NONE;
     private int[][] labyrinth;
-    Paint playerPaint = new Paint(); // später zu sprite ändern
     LabyrinthView labyrinthView;
     private float verticalDeazone = 0.4f;
     private float horizontalDeazone = 0.5f;
@@ -40,10 +39,6 @@ public class PlayerController {
         this.labyrinth = labyrinth;
         playerPositionRow = 0;
         playerPositionCol = 1;
-    }
-
-    public void setPlayerPaint(Paint paint) {
-        playerPaint = paint;
     }
 
     public void resetLevel() {level = 1;}
@@ -80,23 +75,23 @@ public class PlayerController {
             case UP:
                 if(playerPositionRow - 1 < 0)
                     break;
-                if(labyrinth[playerPositionRow - 1][playerPositionCol] == 0) {
+                if(labyrinth[playerPositionRow - 1][playerPositionCol] != 1) {  // != 1 -> 0 und 2 erlaubt, path und entrance
                     playerPositionRow--;
                 }
                 break;
             case DOWN:
                 if(playerPositionRow + 1 > (labyrinth.length - 1))
                     break;
-                if(labyrinth[playerPositionRow + 1][playerPositionCol] == 0) {
+                if(labyrinth[playerPositionRow + 1][playerPositionCol] != 1) {
                     playerPositionRow++;
                 }
                 break;
             case LEFT:
-                if(labyrinth[playerPositionRow][playerPositionCol - 1] == 0)
+                if(labyrinth[playerPositionRow][playerPositionCol - 1] != 1)
                     playerPositionCol--;
                 break;
             case RIGHT:
-                if(labyrinth[playerPositionRow][playerPositionCol + 1] == 0)
+                if(labyrinth[playerPositionRow][playerPositionCol + 1] != 1)
                     playerPositionCol++;
                 break;
             default:
@@ -107,7 +102,7 @@ public class PlayerController {
 
         // Ziel
         if(playerPositionRow == labyrinth.length - 1 && playerPositionCol == labyrinth[0].length - 2) {
-            if(level == 2) {
+            if(level == 5) {
                 //TODO stop movement
                 if(!GameScreenFragment.getInstance().getGameFinished())
                     MainActivity.getInstance().onGameFinished();

@@ -27,14 +27,22 @@ public class PlayerAdapter extends ArrayAdapter<Player> {
 
         Player player = getItem(position);
 
+        TextView positionTextView = (TextView) view.findViewById(R.id.lv_positionTextView);
         TextView nameTextView = (TextView) view.findViewById(R.id.lv_nameTextView);
         TextView levelTextView = (TextView) view.findViewById(R.id.lv_levelTextView);
         TextView timeTextView = (TextView) view.findViewById(R.id.lv_timeTextView);
 
-        // Setze die Werte in den TextViews
+        if(GameScreenFragment.getInstance().getGameFinished()) {
+            SQLiteHandler sqLiteHandler = new SQLiteHandler(MainActivity.getInstance());
+            int pos = sqLiteHandler.getPlayerPosition(player);
+            positionTextView.setText(String.valueOf(pos) + ".");
+        }
+        else {
+            positionTextView.setText(String.valueOf(position + 1) + ".");
+        }
         nameTextView.setText(player.getName());
-        levelTextView.setText("Level: " + String.valueOf(player.getLevel()));
-        timeTextView.setText("Time: " + String.valueOf(player.getTime()));
+        levelTextView.setText(String.valueOf(player.getLevel()));
+        timeTextView.setText(String.valueOf(player.getTime()));
 
         return view;
     }

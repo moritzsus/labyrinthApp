@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -18,6 +19,7 @@ public class BestenlisteFragment extends Fragment {
     private static BestenlisteFragment instance;
     View rootview;
     ListView listViewLeaderboard;
+    ListView listViewLastRun;
 
     public BestenlisteFragment() {
         instance = this;
@@ -33,8 +35,17 @@ public class BestenlisteFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+        //TODO restart button?
         rootview = inflater.inflate(R.layout.fragment_bestenliste, container, false);
         listViewLeaderboard = rootview.findViewById(R.id.listViewLeaderboard);
+        listViewLastRun = rootview.findViewById(R.id.listViewLastRun);
+
+        if(GameScreenFragment.getInstance().getGameFinished()) {
+            listViewLastRun.setVisibility(View.VISIBLE);
+        }
+        else {
+            listViewLastRun.setVisibility(View.INVISIBLE);
+        }
 
         displayLeaderboard();
         return rootview;
@@ -48,5 +59,15 @@ public class BestenlisteFragment extends Fragment {
         //ArrayAdapter playerAdapter = new ArrayAdapter<Player>(MainActivity.getInstance(), android.R.layout.simple_list_item_1, topPlayers);
         PlayerAdapter playerAdapter = new PlayerAdapter(MainActivity.getInstance(), android.R.layout.simple_list_item_1, topPlayers);
         listViewLeaderboard.setAdapter(playerAdapter);
+
+        // display last player run, if leaderboard opens after game
+        if(GameScreenFragment.getInstance().getGameFinished()) {
+            Player lastPlayer = new Player(StartScreenFragment.getInstance().getPlayerName(), PlayerController.getInstance().getLevel(), GameScreenFragment.getInstance().getTime());
+            List<Player> lastPlayerList = new ArrayList<>();
+            lastPlayerList.add(lastPlayer);
+
+            PlayerAdapter playerAdapterLastRun = new PlayerAdapter(MainActivity.getInstance(), android.R.layout.simple_list_item_1, lastPlayerList);
+            listViewLastRun.setAdapter(playerAdapterLastRun);
+        }
     }
 }
