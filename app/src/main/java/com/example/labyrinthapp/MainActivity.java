@@ -9,6 +9,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.media.MediaPlayer;
 import android.media.tv.BroadcastInfoRequest;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,6 +18,7 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.RadioButton;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
@@ -61,11 +63,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private SensorManager sensorManager;
     private Sensor gyroSensor;
     private long lastSensorUpdate = 0;
-    private final long SENSOR_UPDATE_INTERVAL = 250; // Intervall in Millisekunden
+    private final long SENSOR_UPDATE_INTERVAL = 500; // Intervall in Millisekunden
     static private MainActivity instance;
     boolean firstSensorRead = true;
     private Timer tempTimer;
     private TimerTask tempTimerTask;
+
+    private boolean soundOn = true;
     private boolean firstTempRead = true;
     //TODO falls Zeit, ingame sound
     //TODO alle Fragment singletons in oncreate abspeichern -> kann views erstellen
@@ -160,6 +164,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         if(inputMethod == InputMethodEnum.SMARTPHONESENSOR) {
             startTemperatureTimer();
         }
+
         currentScreen = MainActivity.ScreenEnum.GAMESCREEN;
     }
 
@@ -207,6 +212,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
 
         currentScreen = ScreenEnum.SETTINGSSCREEN;
+    }
+
+    public void onSwitchSound(View view) {
+        soundOn = !soundOn;
+
+        GameScreenFragment.getInstance().checkIfMusicPlay();
     }
 
     public void onBrokerSaveClick(View view) {
@@ -394,4 +405,24 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         };
         t.start();
     }
+
+    public void playConnectionSound() {
+        if(!soundOn)
+            return;
+
+        MediaPlayer music = GameScreenFragment.getInstance().getBackgroundMusicMediaPlayer();
+        music.setVolume(0.2f, 0.2f);
+
+        MediaPlayer mp = MediaPlayer.create(this, R.raw.connection);
+        mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mediaPlayer) {
+                music.setVolume(0.6f, 0.6f);
+                mp.release();
+            }
+        });
+        mp.start();
+    }
+
+    public boolean getSoundOn() {return soundOn;}
 }

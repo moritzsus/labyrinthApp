@@ -16,20 +16,10 @@ import java.util.List;
 
 
 public class BestenlisteFragment extends Fragment {
-    private static BestenlisteFragment instance;
     View rootview;
     ListView listViewLeaderboard;
     ListView listViewLastRun;
 
-    public BestenlisteFragment() {
-        instance = this;
-    }
-
-    public static BestenlisteFragment getInstance() {
-        if(instance == null)
-            return new BestenlisteFragment();
-        return instance;
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -55,9 +45,11 @@ public class BestenlisteFragment extends Fragment {
     public void displayLeaderboard() {
         SQLiteHandler sqLiteHandler = new SQLiteHandler(MainActivity.getInstance());
         List<Player> topPlayers = sqLiteHandler.getTop10Players();
-        Log.d("F", "PLAYERS: " + topPlayers);
+        if(topPlayers.size() == 0)
+            listViewLeaderboard.setVisibility(View.INVISIBLE);
+        else
+            listViewLeaderboard.setVisibility(View.VISIBLE);
 
-        //ArrayAdapter playerAdapter = new ArrayAdapter<Player>(MainActivity.getInstance(), android.R.layout.simple_list_item_1, topPlayers);
         PlayerAdapter playerAdapter = new PlayerAdapter(MainActivity.getInstance(), android.R.layout.simple_list_item_1, topPlayers);
         listViewLeaderboard.setAdapter(playerAdapter);
 

@@ -1,5 +1,6 @@
 package com.example.labyrinthapp;
 
+import android.media.MediaPlayer;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -25,13 +26,18 @@ public class GameScreenFragment extends Fragment {
     private TextView levelView;
     private int timeCounter = 0;
     private boolean gameFinished = false;
-    private int rows = 8;
-    private int cols = 8;
+    private int rows = 2;
+    private int cols = 2;
     private int[][] labyrinth;
+    private MediaPlayer musicPlayer;
     static GameScreenFragment instance;
 
     public GameScreenFragment() {
         instance = this;
+
+        musicPlayer = MediaPlayer.create(MainActivity.getInstance(), R.raw.life_of_a_wandering_wizard);
+        musicPlayer.setLooping(true);
+        musicPlayer.setVolume(0.6f, 0.6f);
     }
 
     static GameScreenFragment getInstance() {
@@ -60,6 +66,25 @@ public class GameScreenFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+
+        if(MainActivity.getInstance().getSoundOn())
+            musicPlayer.start();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        if(MainActivity.getInstance().getSoundOn())
+            musicPlayer.pause();
+    }
+
+    public void checkIfMusicPlay() {
+
+        if(MainActivity.getInstance().getSoundOn())
+            musicPlayer.start();
+        else
+            musicPlayer.pause();
     }
 
     public void sendLabyrinthToView() {
@@ -136,5 +161,9 @@ public class GameScreenFragment extends Fragment {
 
     public int getTime() {
         return timeCounter;
+    }
+
+    public MediaPlayer getBackgroundMusicMediaPlayer() {
+        return musicPlayer;
     }
 }

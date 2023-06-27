@@ -40,6 +40,7 @@ public class MqttHandler {
             connOpts.setConnectionTimeout(2000);
             client.connect(connOpts);
             Log.d("MQTT", "Connected with broker: " + broker);
+            MainActivity.getInstance().playConnectionSound();
         } catch (MqttException me) {
             Log.e("MQTT", "Reason: " + me.getReasonCode());
             Log.e("MQTT", "Message: " + me.getMessage());

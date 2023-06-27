@@ -1,6 +1,7 @@
 package com.example.labyrinthapp;
 
 import android.graphics.Paint;
+import android.media.MediaPlayer;
 import android.telecom.Call;
 import android.util.Log;
 import android.view.View;
@@ -17,7 +18,6 @@ public class PlayerController {
     private float verticalDeazone = 0.4f;
     private float horizontalDeazone = 0.5f;
     private int level = 1;
-    private boolean skipPlayerMove = false;
 
     public PlayerController() {
         instance = this;
@@ -72,11 +72,6 @@ public class PlayerController {
         // set direction depending on the flags
         determineDirection(up, down, left, right);
 
-        // doppelt so oft lagesensor input wie movement
-        skipPlayerMove = !skipPlayerMove;
-        if(skipPlayerMove)
-            return;
-
         switch (direction) {
             case UP:
                 if(playerPositionRow - 1 < 0)
@@ -112,6 +107,21 @@ public class PlayerController {
                 //TODO stop movement
                 if(!GameScreenFragment.getInstance().getGameFinished())
                     MainActivity.getInstance().onGameFinished();
+
+                if(MainActivity.getInstance().getSoundOn()) {
+                    MediaPlayer music = GameScreenFragment.getInstance().getBackgroundMusicMediaPlayer();
+                    music.stop();
+
+                    MediaPlayer mp = MediaPlayer.create(MainActivity.getInstance(), R.raw.game_complete);
+                    mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                        @Override
+                        public void onCompletion(MediaPlayer mediaPlayer) {
+                            music.setVolume(0.6f, 0.6f);
+                            mp.release();
+                        }
+                    });
+                    mp.start();
+                }
             }
             else {
                 //TODO erster frame bei neuem labyrinth ist player noch im ziel (erst im nächsten frame neues labyrinth?)
@@ -121,6 +131,22 @@ public class PlayerController {
                 GameScreenFragment.getInstance().setLevel(level);
                 //TODO keep direction -> dann wäre erster tick spieler 1 weiter vorm startpunkt -> bool variable?
                 direction = Direction.NONE;
+
+                if(MainActivity.getInstance().getSoundOn()) {
+                    MediaPlayer music = GameScreenFragment.getInstance().getBackgroundMusicMediaPlayer();
+                    music.setVolume(0.2f, 0.2f);
+
+                    MediaPlayer mp = MediaPlayer.create(MainActivity.getInstance(), R.raw.level_passed);
+
+                    mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                        @Override
+                        public void onCompletion(MediaPlayer mediaPlayer) {
+                            music.setVolume(0.6f, 0.6f);
+                            mp.release();
+                        }
+                    });
+                    mp.start();
+                }
             }
         }
     }

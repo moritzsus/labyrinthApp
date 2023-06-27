@@ -48,11 +48,13 @@
         app:layout_constraintVertical_bias="0.060000002" />
 
     <com.google.android.material.switchmaterial.SwitchMaterial
-        android:id="@+id/switchMaterial"
+        android:id="@+id/soundSwitch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:scaleX="1.2"
         android:scaleY="1.2"
+        android:checked="true"
+        android:onClick="onSwitchSound"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -70,7 +72,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/switchMaterial"
+        app:layout_constraintTop_toBottomOf="@+id/soundSwitch"
         app:layout_constraintVertical_bias="0.060000002" />
 
     <RadioGroup
