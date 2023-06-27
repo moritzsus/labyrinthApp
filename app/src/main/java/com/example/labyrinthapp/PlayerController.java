@@ -1,6 +1,7 @@
 package com.example.labyrinthapp;
 
 import android.graphics.Paint;
+import android.media.MediaPlayer;
 import android.telecom.Call;
 import android.util.Log;
 import android.view.View;
@@ -9,27 +10,26 @@ public class PlayerController {
     enum Direction {
         NONE, UP, DOWN, LEFT, RIGHT
     }
-    static PlayerController playerController;
+    static PlayerController instance;
     int playerPositionRow, playerPositionCol;
     Direction direction = Direction.NONE;
     private int[][] labyrinth;
-    Paint playerPaint = new Paint(); // später zu sprite ändern
     LabyrinthView labyrinthView;
-    private float verticalDeazone = 0.2f;
+    private float verticalDeazone = 0.4f;
     private float horizontalDeazone = 0.5f;
     private int level = 1;
 
     public PlayerController() {
+        instance = this;
         playerPositionRow = 0;
         playerPositionCol = 1;
     }
 
     public static PlayerController getInstance() {
-        if(playerController == null) {
-            playerController = new PlayerController();
-            return playerController;
+        if(instance == null) {
+            return new PlayerController();
         }
-        return playerController;
+        return instance;
     }
 
     public void setLabyrinthView(LabyrinthView labyrinthView) {
@@ -42,8 +42,9 @@ public class PlayerController {
         playerPositionCol = 1;
     }
 
-    public void setPlayerPaint(Paint paint) {
-        playerPaint = paint;
+    public void resetLevel() {level = 1;}
+    public int getLevel() {
+        return level;
     }
 
     // rotation values
@@ -75,23 +76,23 @@ public class PlayerController {
             case UP:
                 if(playerPositionRow - 1 < 0)
                     break;
-                if(labyrinth[playerPositionRow - 1][playerPositionCol] == 0) {
+                if(labyrinth[playerPositionRow - 1][playerPositionCol] != 1) {  // != 1 -> 0 und 2 erlaubt, path und entrance
                     playerPositionRow--;
                 }
                 break;
             case DOWN:
                 if(playerPositionRow + 1 > (labyrinth.length - 1))
                     break;
-                if(labyrinth[playerPositionRow + 1][playerPositionCol] == 0) {
+                if(labyrinth[playerPositionRow + 1][playerPositionCol] != 1) {
                     playerPositionRow++;
                 }
                 break;
             case LEFT:
-                if(labyrinth[playerPositionRow][playerPositionCol - 1] == 0)
+                if(labyrinth[playerPositionRow][playerPositionCol - 1] != 1)
                     playerPositionCol--;
                 break;
             case RIGHT:
-                if(labyrinth[playerPositionRow][playerPositionCol + 1] == 0)
+                if(labyrinth[playerPositionRow][playerPositionCol + 1] != 1)
                     playerPositionCol++;
                 break;
             default:
@@ -103,15 +104,49 @@ public class PlayerController {
         // Ziel
         if(playerPositionRow == labyrinth.length - 1 && playerPositionCol == labyrinth[0].length - 2) {
             if(level == 5) {
-                Log.d("Rotationswerte", "ALL FINISHED");
+                //TODO stop movement
+                if(!GameScreenFragment.getInstance().getGameFinished())
+                    MainActivity.getInstance().onGameFinished();
+
+                if(MainActivity.getInstance().getSoundOn()) {
+                    MediaPlayer music = GameScreenFragment.getInstance().getBackgroundMusicMediaPlayer();
+                    music.stop();
+
+                    MediaPlayer mp = MediaPlayer.create(MainActivity.getInstance(), R.raw.game_complete);
+                    mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                        @Override
+                        public void onCompletion(MediaPlayer mediaPlayer) {
+                            music.setVolume(0.6f, 0.6f);
+                            mp.release();
+                        }
+                    });
+                    mp.start();
+                }
             }
             else {
-                //TODO erster frame bei neuem labyrinth ist player noch im ziel
-                Log.d("Rotationswerte", "Level " + level + " FINISHED");
+                //TODO erster frame bei neuem labyrinth ist player noch im ziel (erst im nächsten frame neues labyrinth?)
                 level++;
                 GameScreenFragment.getInstance().generateLabyrinth();
                 GameScreenFragment.getInstance().sendLabyrinthToView();
+                GameScreenFragment.getInstance().setLevel(level);
+                //TODO keep direction -> dann wäre erster tick spieler 1 weiter vorm startpunkt -> bool variable?
                 direction = Direction.NONE;
+
+                if(MainActivity.getInstance().getSoundOn()) {
+                    MediaPlayer music = GameScreenFragment.getInstance().getBackgroundMusicMediaPlayer();
+                    music.setVolume(0.2f, 0.2f);
+
+                    MediaPlayer mp = MediaPlayer.create(MainActivity.getInstance(), R.raw.level_passed);
+
+                    mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                        @Override
+                        public void onCompletion(MediaPlayer mediaPlayer) {
+                            music.setVolume(0.6f, 0.6f);
+                            mp.release();
+                        }
+                    });
+                    mp.start();
+                }
             }
         }
     }
