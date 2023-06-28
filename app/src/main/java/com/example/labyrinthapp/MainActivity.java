@@ -293,6 +293,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     public void onGameFinished() {
+        //TODO resign knopf
         //TODO only when MPU is connected -> crash
         //TODO stop Timer
         //TODO Bestenliste SQLite
