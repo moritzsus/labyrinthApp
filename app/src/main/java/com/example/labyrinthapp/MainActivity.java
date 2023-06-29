@@ -133,6 +133,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        // Zurück-Geste unterbinden, keine Aktion ausführen
+    }
+
+
     public static MainActivity getInstance() {
         if(instance == null)
             return new MainActivity();
