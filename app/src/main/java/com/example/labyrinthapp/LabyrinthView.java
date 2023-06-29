@@ -42,6 +42,7 @@ public class LabyrinthView extends AppCompatImageView {
     public void setLabyrinth(int[][] labyrinth) {
         this.labyrinth = labyrinth;
 
+        //TODO new lv 5 entrance
         switch (PlayerController.getInstance().getLevel()) {
             case 1:
                 pathTexture = BitmapFactory.decodeResource(getResources(), R.drawable.stage1_path);
@@ -96,7 +97,6 @@ public class LabyrinthView extends AppCompatImageView {
         cellSize = Math.min(viewWidth, viewHeight) / labyrinth.length;
 
         if(firstDrawInLevel) {
-            //TODO maybe in init
             firstDrawInLevel = false;
             pathTexture = Bitmap.createScaledBitmap(pathTexture, cellSize, cellSize, false);
             wallTexture = Bitmap.createScaledBitmap(wallTexture, cellSize, cellSize, false);

@@ -69,6 +69,8 @@ public class GameScreenFragment extends Fragment {
 
         if(MainActivity.getInstance().getSoundOn())
             musicPlayer.start();
+
+        PlayerController.getInstance().resetDirection();
     }
 
     @Override
@@ -88,7 +90,6 @@ public class GameScreenFragment extends Fragment {
     }
 
     public void sendLabyrinthToView() {
-        //TODO machmal 0 bei game neustart (delay?)
         labyrinthView.setLabyrinth(labyrinth);
     }
 
@@ -133,7 +134,6 @@ public class GameScreenFragment extends Fragment {
         MainActivity.getInstance().displayStatus(temperatureView, temperature);
     }
     public void setTimer() {
-        //TODO correct time format (x.xx)
         if(!gameFinished) {
             String timerStr = Integer.toString(timeCounter);
             MainActivity.getInstance().displayStatus(timerView, timerStr);
