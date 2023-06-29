@@ -36,6 +36,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 //TODO Log nachrichten anpassen (mit TAGS?)
+//TODO strings etc in xml files
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
 
     public enum ScreenEnum {
