@@ -96,7 +96,6 @@ public class LabyrinthView extends AppCompatImageView {
         cellSize = Math.min(viewWidth, viewHeight) / labyrinth.length;
 
         if(firstDrawInLevel) {
-            //TODO maybe in init
             firstDrawInLevel = false;
             pathTexture = Bitmap.createScaledBitmap(pathTexture, cellSize, cellSize, false);
             wallTexture = Bitmap.createScaledBitmap(wallTexture, cellSize, cellSize, false);

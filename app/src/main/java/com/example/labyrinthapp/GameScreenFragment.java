@@ -26,8 +26,8 @@ public class GameScreenFragment extends Fragment {
     private TextView levelView;
     private int timeCounter = 0;
     private boolean gameFinished = false;
-    private int rows = 2;
-    private int cols = 2;
+    private int rows = 8;
+    private int cols = 8;
     private int[][] labyrinth;
     private MediaPlayer musicPlayer;
     static GameScreenFragment instance;
@@ -37,7 +37,7 @@ public class GameScreenFragment extends Fragment {
 
         musicPlayer = MediaPlayer.create(MainActivity.getInstance(), R.raw.life_of_a_wandering_wizard);
         musicPlayer.setLooping(true);
-        musicPlayer.setVolume(0.6f, 0.6f);
+        musicPlayer.setVolume(0.4f, 0.4f);
     }
 
     static GameScreenFragment getInstance() {
@@ -46,6 +46,7 @@ public class GameScreenFragment extends Fragment {
 
         return instance;
     }
+    //TODO button designs
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -69,6 +70,8 @@ public class GameScreenFragment extends Fragment {
 
         if(MainActivity.getInstance().getSoundOn())
             musicPlayer.start();
+
+        PlayerController.getInstance().resetDirection();
     }
 
     @Override
@@ -91,6 +94,11 @@ public class GameScreenFragment extends Fragment {
         labyrinthView.setLabyrinth(labyrinth);
     }
 
+    public void setLabyrinthSize(int rows, int cols){
+        this.rows = rows;
+        this.cols = cols;
+    }
+
     public void generateLabyrinth() {
         int expandedRows = 2 * rows + 1;
         int expandedCols = 2 * cols + 1;
@@ -100,16 +108,12 @@ public class GameScreenFragment extends Fragment {
             Arrays.fill(labyrinth[i], 1);
         }
         // start und ziel setzzen
-        // TODO 0, 1, 2 als enum?
         labyrinth[0][1] = 2;
         labyrinth[expandedRows - 1][expandedCols - 2] = 2;
 
         // Erzeuge ein Labyrinth im inneren Bereich
         labyrinth[1][1] = 0;
         carvePassages(1, 1);
-
-        // Setze das Ziel (wird oben schon gemacht?)
-        //labyrinth[expandedRows - 2][expandedCols - 2] = 0;
     }
 
     private void carvePassages(int row, int col) {
@@ -132,7 +136,6 @@ public class GameScreenFragment extends Fragment {
         MainActivity.getInstance().displayStatus(temperatureView, temperature);
     }
     public void setTimer() {
-        //TODO correct time format (x.xx)
         if(!gameFinished) {
             String timerStr = Integer.toString(timeCounter);
             MainActivity.getInstance().displayStatus(timerView, timerStr);

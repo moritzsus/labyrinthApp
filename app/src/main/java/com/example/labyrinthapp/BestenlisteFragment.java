@@ -20,12 +20,10 @@ public class BestenlisteFragment extends Fragment {
     ListView listViewLeaderboard;
     ListView listViewLastRun;
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        //TODO restart button?
         rootview = inflater.inflate(R.layout.fragment_bestenliste, container, false);
         listViewLeaderboard = rootview.findViewById(R.id.listViewLeaderboard);
         listViewLastRun = rootview.findViewById(R.id.listViewLastRun);
@@ -55,7 +53,7 @@ public class BestenlisteFragment extends Fragment {
 
         // display last player run, if leaderboard opens after game
         if(GameScreenFragment.getInstance().getGameFinished()) {
-            Player lastPlayer = new Player(StartScreenFragment.getInstance().getPlayerName(), PlayerController.getInstance().getLevel(), GameScreenFragment.getInstance().getTime());
+            Player lastPlayer = new Player(StartScreenFragment.getInstance().getPlayerName(), PlayerController.getInstance().getLevel() - 1, GameScreenFragment.getInstance().getTime());
             List<Player> lastPlayerList = new ArrayList<>();
             lastPlayerList.add(lastPlayer);
 

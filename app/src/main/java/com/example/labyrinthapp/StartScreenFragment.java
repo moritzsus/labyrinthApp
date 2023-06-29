@@ -15,6 +15,7 @@ public class StartScreenFragment extends Fragment {
     View rootview;
     private EditText editTextName;
     //TODO fix or delete2
+    //TODO only red border if no input
     private String playerName = "NAME";
     static StartScreenFragment instance;
 

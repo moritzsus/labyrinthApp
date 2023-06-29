@@ -35,14 +35,14 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+//TODO Log nachrichten anpassen (mit TAGS?)
+//TODO strings etc in xml files
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
 
     public enum ScreenEnum {
         STARTSCREEN, GAMESCREEN, SETTINGSSCREEN, BESTENLISTESCREEN
-        //TODO renam bestenlsite?
     }
-    ScreenEnum currentScreen = ScreenEnum.STARTSCREEN;;
-    //TODO lastScreen löschen?
+    ScreenEnum currentScreen = ScreenEnum.STARTSCREEN;
     ScreenEnum lastScreen;
 
     public enum InputMethodEnum {
@@ -69,10 +69,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private Timer tempTimer;
     private TimerTask tempTimerTask;
 
-    private boolean soundOn = true;
+    private boolean soundOn;
     private boolean firstTempRead = true;
-    //TODO falls Zeit, ingame sound
-    //TODO alle Fragment singletons in oncreate abspeichern -> kann views erstellen
 
     public MainActivity() {
         instance = this;
@@ -90,7 +88,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     .add(R.id.fragment_container_view, StartScreenFragment.class, null)
                     .commit();
         }
-
+        soundOn = true;
         mqttHandler = new MqttHandler();
         mqttHandler.setBroker(BROKER);
         // Initialisiere den SensorManager
@@ -120,7 +118,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     protected void onPause() {
-        //TODO Handydaten Pausieren/resumen
         super.onPause();
         if(inputMethod == InputMethodEnum.MPU6050) {
             mqttHandler.disconnect(mpu_sub_topic, temp_sub_topic);
@@ -132,6 +129,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 tempTimer.cancel();
         }
     }
+
+    @Override
+    public void onBackPressed() {
+        // Zurück-Geste unterbinden, keine Aktion ausführen
+    }
+
 
     public static MainActivity getInstance() {
         if(instance == null)
@@ -159,7 +162,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 .commit();
 
         PlayerController.getInstance().resetLevel();
-        GameScreenFragment.getInstance().setGameFinished(false);
 
         if(inputMethod == InputMethodEnum.SMARTPHONESENSOR) {
             startTemperatureTimer();
@@ -171,6 +173,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public void onHomeButtonClick(View view) {
         if(currentScreen != ScreenEnum.GAMESCREEN)
             return;
+
+        GameScreenFragment.getInstance().setLabyrinthSize(8,8);
+        firstSensorRead = true;
 
         getSupportFragmentManager().beginTransaction()
                 .setReorderingAllowed(true)
@@ -184,6 +189,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 firstTempRead = true;
             }
         }
+
+        GameScreenFragment.getInstance().setGameFinished(false);
 
         //TODO fix or delete
         //String name = StartScreenFragment.getInstance().getNameString();
@@ -217,7 +224,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public void onSwitchSound(View view) {
         soundOn = !soundOn;
 
-        GameScreenFragment.getInstance().checkIfMusicPlay();
+        if(lastScreen == ScreenEnum.GAMESCREEN)
+            GameScreenFragment.getInstance().checkIfMusicPlay();
     }
 
     public void onBrokerSaveClick(View view) {
@@ -294,8 +302,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     public void onGameFinished() {
         //TODO only when MPU is connected -> crash
-        //TODO stop Timer
-        //TODO Bestenliste SQLite
         //mqttHandler.publish(pub_topic, "Game Finished");
 
         GameScreenFragment.getInstance().setGameFinished(true);
@@ -305,11 +311,34 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         String name = StartScreenFragment.getInstance().getPlayerName();
         Log.d("NAME", "NAME: " + name);
 
-        //TODO error handling?
-        boolean success = sqLiteHandler.addPlayer(name, PlayerController.getInstance().getLevel(), GameScreenFragment.getInstance().getTime());
+        sqLiteHandler.addPlayer(name, PlayerController.getInstance().getLevel() - 1, GameScreenFragment.getInstance().getTime());
         onBestenlisteClick(null);
+    }
 
-        //TODO delay before leaderboard open?
+    public void onResignClick(View view) {
+        onGameFinished();
+    }
+
+    public void onRestartClick(View view) {
+        if(currentScreen == ScreenEnum.GAMESCREEN && inputMethod == InputMethodEnum.SMARTPHONESENSOR) {
+            if(tempTimer != null) {
+                tempTimer.cancel();
+                firstTempRead = true;
+            }
+        }
+        GameScreenFragment.getInstance().setGameFinished(false);
+
+        getSupportFragmentManager().beginTransaction()
+                .setReorderingAllowed(true)
+                .replace(R.id.fragment_container_view, GameScreenFragment.class, null)
+                .addToBackStack(null)
+                .commit();
+
+        PlayerController.getInstance().resetLevel();
+
+        if(inputMethod == InputMethodEnum.SMARTPHONESENSOR) {
+            startTemperatureTimer();
+        }
     }
 
     @Override
@@ -321,7 +350,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         if(currentScreen == ScreenEnum.GAMESCREEN) {
             if (sensorEvent.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
                 long currentTime = System.currentTimeMillis();
-                // TODO falls Zeit, immer prüfen, nur alle 500ms an moveplayer schicken, damit bewegungen zwischen 2 ticks td erkannt werden (muss direction hier speichern?)
                 if (currentTime - lastSensorUpdate >= SENSOR_UPDATE_INTERVAL) {
                     if(firstSensorRead) {
                         firstSensorRead = false;

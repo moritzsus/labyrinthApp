@@ -97,14 +97,12 @@ public class PlayerController {
                 break;
             default:
         }
-        //TODO im ziel -> direction NONE
-        //TODO wenn Abbruch -> Homescreen -> direction NONE
         labyrinthView.setPlayerIndex(playerPositionRow, playerPositionCol);
 
         // Ziel
         if(playerPositionRow == labyrinth.length - 1 && playerPositionCol == labyrinth[0].length - 2) {
             if(level == 5) {
-                //TODO stop movement
+                level++; // 6 means completed lv 5 (for SQL)
                 if(!GameScreenFragment.getInstance().getGameFinished())
                     MainActivity.getInstance().onGameFinished();
 
@@ -116,7 +114,6 @@ public class PlayerController {
                     mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                         @Override
                         public void onCompletion(MediaPlayer mediaPlayer) {
-                            music.setVolume(0.6f, 0.6f);
                             mp.release();
                         }
                     });
@@ -124,24 +121,33 @@ public class PlayerController {
                 }
             }
             else {
-                //TODO erster frame bei neuem labyrinth ist player noch im ziel (erst im nächsten frame neues labyrinth?)
                 level++;
+
+                switch (level){
+                    case 2:
+                        GameScreenFragment.getInstance().setLabyrinthSize(1,1);
+                        break;
+                    case 3:
+                        GameScreenFragment.getInstance().setLabyrinthSize(1,1);
+                        break;
+                    case 4:
+                        GameScreenFragment.getInstance().setLabyrinthSize(1, 1);
+                        break;
+                    case 5:
+                        GameScreenFragment.getInstance().setLabyrinthSize(2,2);
+                        break;
+                }
                 GameScreenFragment.getInstance().generateLabyrinth();
                 GameScreenFragment.getInstance().sendLabyrinthToView();
                 GameScreenFragment.getInstance().setLevel(level);
-                //TODO keep direction -> dann wäre erster tick spieler 1 weiter vorm startpunkt -> bool variable?
                 direction = Direction.NONE;
 
                 if(MainActivity.getInstance().getSoundOn()) {
-                    MediaPlayer music = GameScreenFragment.getInstance().getBackgroundMusicMediaPlayer();
-                    music.setVolume(0.2f, 0.2f);
-
                     MediaPlayer mp = MediaPlayer.create(MainActivity.getInstance(), R.raw.level_passed);
 
                     mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                         @Override
                         public void onCompletion(MediaPlayer mediaPlayer) {
-                            music.setVolume(0.6f, 0.6f);
                             mp.release();
                         }
                     });
@@ -186,5 +192,9 @@ public class PlayerController {
             if(!left && up) direction = Direction.UP;
             if(!left && down) direction = Direction.DOWN;
         }
+    }
+
+    public void resetDirection() {
+        direction = Direction.NONE;
     }
 }
