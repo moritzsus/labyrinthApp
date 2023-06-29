@@ -35,14 +35,13 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+//TODO Log nachrichten anpassen (mit TAGS?)
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
 
     public enum ScreenEnum {
         STARTSCREEN, GAMESCREEN, SETTINGSSCREEN, BESTENLISTESCREEN
-        //TODO renam bestenlsite?
     }
-    ScreenEnum currentScreen = ScreenEnum.STARTSCREEN;;
-    //TODO lastScreen löschen?
+    ScreenEnum currentScreen = ScreenEnum.STARTSCREEN;
     ScreenEnum lastScreen;
 
     public enum InputMethodEnum {
@@ -71,8 +70,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     private boolean soundOn = true;
     private boolean firstTempRead = true;
-    //TODO falls Zeit, ingame sound
-    //TODO alle Fragment singletons in oncreate abspeichern -> kann views erstellen
 
     public MainActivity() {
         instance = this;
@@ -120,7 +117,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     protected void onPause() {
-        //TODO Handydaten Pausieren/resumen
         super.onPause();
         if(inputMethod == InputMethodEnum.MPU6050) {
             mqttHandler.disconnect(mpu_sub_topic, temp_sub_topic);
@@ -165,7 +161,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 .commit();
 
         PlayerController.getInstance().resetLevel();
-        GameScreenFragment.getInstance().setGameFinished(false);
 
         if(inputMethod == InputMethodEnum.SMARTPHONESENSOR) {
             startTemperatureTimer();
@@ -190,6 +185,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 firstTempRead = true;
             }
         }
+
+        GameScreenFragment.getInstance().setGameFinished(false);
 
         //TODO fix or delete
         //String name = StartScreenFragment.getInstance().getNameString();
@@ -299,10 +296,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     public void onGameFinished() {
-        //TODO resign knopf
         //TODO only when MPU is connected -> crash
-        //TODO stop Timer
-        //TODO Bestenliste SQLite
         //mqttHandler.publish(pub_topic, "Game Finished");
 
         GameScreenFragment.getInstance().setGameFinished(true);
@@ -312,11 +306,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         String name = StartScreenFragment.getInstance().getPlayerName();
         Log.d("NAME", "NAME: " + name);
 
-        //TODO error handling?
-        boolean success = sqLiteHandler.addPlayer(name, PlayerController.getInstance().getLevel() - 1, GameScreenFragment.getInstance().getTime());
+        sqLiteHandler.addPlayer(name, PlayerController.getInstance().getLevel() - 1, GameScreenFragment.getInstance().getTime());
         onBestenlisteClick(null);
-
-        //TODO delay before leaderboard open?
     }
 
     public void onResignClick(View view) {
@@ -332,7 +323,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         if(currentScreen == ScreenEnum.GAMESCREEN) {
             if (sensorEvent.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
                 long currentTime = System.currentTimeMillis();
-                // TODO falls Zeit, immer prüfen, nur alle 500ms an moveplayer schicken, damit bewegungen zwischen 2 ticks td erkannt werden (muss direction hier speichern?)
                 if (currentTime - lastSensorUpdate >= SENSOR_UPDATE_INTERVAL) {
                     if(firstSensorRead) {
                         firstSensorRead = false;
@@ -421,6 +411,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         if(!soundOn)
             return;
         //TODO sound bleibt nach level up manchmal leise
+        //TODO gamescreen -> homescreen -> switch sound is bugged (doppelt sound and plays in homescreen) (check if gamescreen?)
         MediaPlayer music = GameScreenFragment.getInstance().getBackgroundMusicMediaPlayer();
         music.setVolume(0.2f, 0.2f);
 

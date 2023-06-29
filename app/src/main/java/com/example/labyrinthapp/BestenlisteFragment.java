@@ -20,7 +20,6 @@ public class BestenlisteFragment extends Fragment {
     ListView listViewLeaderboard;
     ListView listViewLastRun;
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
