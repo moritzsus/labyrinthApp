@@ -307,10 +307,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         Log.d("NAME", "NAME: " + name);
 
         //TODO error handling?
-        boolean success = sqLiteHandler.addPlayer(name, PlayerController.getInstance().getLevel(), GameScreenFragment.getInstance().getTime());
+        boolean success = sqLiteHandler.addPlayer(name, PlayerController.getInstance().getLevel() - 1, GameScreenFragment.getInstance().getTime());
         onBestenlisteClick(null);
 
         //TODO delay before leaderboard open?
+    }
+
+    public void onResignClick(View view) {
+        onGameFinished();
     }
 
     @Override
