@@ -24,7 +24,6 @@ public class BestenlisteFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        //TODO restart button?
         rootview = inflater.inflate(R.layout.fragment_bestenliste, container, false);
         listViewLeaderboard = rootview.findViewById(R.id.listViewLeaderboard);
         listViewLastRun = rootview.findViewById(R.id.listViewLastRun);
