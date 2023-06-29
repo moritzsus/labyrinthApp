@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private Timer tempTimer;
     private TimerTask tempTimerTask;
 
-    private boolean soundOn = true;
+    private boolean soundOn;
     private boolean firstTempRead = true;
 
     public MainActivity() {
@@ -88,7 +88,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     .add(R.id.fragment_container_view, StartScreenFragment.class, null)
                     .commit();
         }
-
+        soundOn = true;
         mqttHandler = new MqttHandler();
         mqttHandler.setBroker(BROKER);
         // Initialisiere den SensorManager
@@ -175,6 +175,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             return;
 
         GameScreenFragment.getInstance().setLabyrinthSize(8,8);
+        firstSensorRead = true;
 
         getSupportFragmentManager().beginTransaction()
                 .setReorderingAllowed(true)
@@ -223,7 +224,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public void onSwitchSound(View view) {
         soundOn = !soundOn;
 
-        GameScreenFragment.getInstance().checkIfMusicPlay();
+        if(lastScreen == ScreenEnum.GAMESCREEN)
+            GameScreenFragment.getInstance().checkIfMusicPlay();
     }
 
     public void onBrokerSaveClick(View view) {
@@ -435,8 +437,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public void playConnectionSound() {
         if(!soundOn)
             return;
-        //TODO sound bleibt nach level up manchmal leise
-        //TODO gamescreen -> homescreen -> switch sound is bugged (doppelt sound and plays in homescreen) (check if gamescreen?)
+
         MediaPlayer music = GameScreenFragment.getInstance().getBackgroundMusicMediaPlayer();
         music.setVolume(0.2f, 0.2f);
 

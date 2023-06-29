@@ -114,7 +114,6 @@ public class PlayerController {
                     mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                         @Override
                         public void onCompletion(MediaPlayer mediaPlayer) {
-                            music.setVolume(0.6f, 0.6f);
                             mp.release();
                         }
                     });
@@ -126,16 +125,16 @@ public class PlayerController {
 
                 switch (level){
                     case 2:
-                        GameScreenFragment.getInstance().setLabyrinthSize(9,9);
+                        GameScreenFragment.getInstance().setLabyrinthSize(1,1);
                         break;
                     case 3:
-                        GameScreenFragment.getInstance().setLabyrinthSize(10,10);
+                        GameScreenFragment.getInstance().setLabyrinthSize(1,1);
                         break;
                     case 4:
-                        GameScreenFragment.getInstance().setLabyrinthSize(11,11);
+                        GameScreenFragment.getInstance().setLabyrinthSize(1, 1);
                         break;
                     case 5:
-                        GameScreenFragment.getInstance().setLabyrinthSize(12,12);
+                        GameScreenFragment.getInstance().setLabyrinthSize(2,2);
                         break;
                 }
                 GameScreenFragment.getInstance().generateLabyrinth();
@@ -144,15 +143,11 @@ public class PlayerController {
                 direction = Direction.NONE;
 
                 if(MainActivity.getInstance().getSoundOn()) {
-                    MediaPlayer music = GameScreenFragment.getInstance().getBackgroundMusicMediaPlayer();
-                    music.setVolume(0.2f, 0.2f);
-
                     MediaPlayer mp = MediaPlayer.create(MainActivity.getInstance(), R.raw.level_passed);
 
                     mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                         @Override
                         public void onCompletion(MediaPlayer mediaPlayer) {
-                            music.setVolume(0.6f, 0.6f);
                             mp.release();
                         }
                     });
