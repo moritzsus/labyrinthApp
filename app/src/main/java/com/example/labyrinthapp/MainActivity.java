@@ -173,6 +173,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         if(currentScreen != ScreenEnum.GAMESCREEN)
             return;
 
+        GameScreenFragment.getInstance().setLabyrinthSize(8,8);
+
         getSupportFragmentManager().beginTransaction()
                 .setReorderingAllowed(true)
                 .replace(R.id.fragment_container_view, StartScreenFragment.class, null)

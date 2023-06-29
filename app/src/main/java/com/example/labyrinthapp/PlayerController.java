@@ -123,6 +123,21 @@ public class PlayerController {
             }
             else {
                 level++;
+
+                switch (level){
+                    case 2:
+                        GameScreenFragment.getInstance().setLabyrinthSize(9,9);
+                        break;
+                    case 3:
+                        GameScreenFragment.getInstance().setLabyrinthSize(10,10);
+                        break;
+                    case 4:
+                        GameScreenFragment.getInstance().setLabyrinthSize(11,11);
+                        break;
+                    case 5:
+                        GameScreenFragment.getInstance().setLabyrinthSize(12,12);
+                        break;
+                }
                 GameScreenFragment.getInstance().generateLabyrinth();
                 GameScreenFragment.getInstance().sendLabyrinthToView();
                 GameScreenFragment.getInstance().setLevel(level);

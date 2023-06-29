@@ -94,6 +94,11 @@ public class GameScreenFragment extends Fragment {
         labyrinthView.setLabyrinth(labyrinth);
     }
 
+    public void setLabyrinthSize(int rows, int cols){
+        this.rows = rows;
+        this.cols = cols;
+    }
+
     public void generateLabyrinth() {
         int expandedRows = 2 * rows + 1;
         int expandedCols = 2 * cols + 1;
