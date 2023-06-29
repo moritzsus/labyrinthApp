@@ -26,8 +26,8 @@ public class GameScreenFragment extends Fragment {
     private TextView levelView;
     private int timeCounter = 0;
     private boolean gameFinished = false;
-    private int rows = 2;
-    private int cols = 2;
+    private int rows = 8;
+    private int cols = 8;
     private int[][] labyrinth;
     private MediaPlayer musicPlayer;
     static GameScreenFragment instance;
@@ -88,6 +88,7 @@ public class GameScreenFragment extends Fragment {
     }
 
     public void sendLabyrinthToView() {
+        //TODO machmal 0 bei game neustart (delay?)
         labyrinthView.setLabyrinth(labyrinth);
     }
 

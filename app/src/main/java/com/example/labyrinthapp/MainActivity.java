@@ -410,7 +410,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public void playConnectionSound() {
         if(!soundOn)
             return;
-
+        //TODO sound bleibt nach level up manchmal leise
         MediaPlayer music = GameScreenFragment.getInstance().getBackgroundMusicMediaPlayer();
         music.setVolume(0.2f, 0.2f);
 
