@@ -37,7 +37,7 @@ public class GameScreenFragment extends Fragment {
 
         musicPlayer = MediaPlayer.create(MainActivity.getInstance(), R.raw.life_of_a_wandering_wizard);
         musicPlayer.setLooping(true);
-        musicPlayer.setVolume(0.6f, 0.6f);
+        musicPlayer.setVolume(0.4f, 0.4f);
     }
 
     static GameScreenFragment getInstance() {

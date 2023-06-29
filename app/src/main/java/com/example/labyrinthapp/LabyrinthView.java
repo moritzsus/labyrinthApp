@@ -42,7 +42,6 @@ public class LabyrinthView extends AppCompatImageView {
     public void setLabyrinth(int[][] labyrinth) {
         this.labyrinth = labyrinth;
 
-        //TODO new lv 5 entrance
         switch (PlayerController.getInstance().getLevel()) {
             case 1:
                 pathTexture = BitmapFactory.decodeResource(getResources(), R.drawable.stage1_path);
