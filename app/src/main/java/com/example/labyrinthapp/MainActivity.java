@@ -314,6 +314,28 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         onGameFinished();
     }
 
+    public void onRestartClick(View view) {
+        if(currentScreen == ScreenEnum.GAMESCREEN && inputMethod == InputMethodEnum.SMARTPHONESENSOR) {
+            if(tempTimer != null) {
+                tempTimer.cancel();
+                firstTempRead = true;
+            }
+        }
+        GameScreenFragment.getInstance().setGameFinished(false);
+
+        getSupportFragmentManager().beginTransaction()
+                .setReorderingAllowed(true)
+                .replace(R.id.fragment_container_view, GameScreenFragment.class, null)
+                .addToBackStack(null)
+                .commit();
+
+        PlayerController.getInstance().resetLevel();
+
+        if(inputMethod == InputMethodEnum.SMARTPHONESENSOR) {
+            startTemperatureTimer();
+        }
+    }
+
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
         if(inputMethod == InputMethodEnum.MPU6050 || GameScreenFragment.getInstance().getGameFinished())
