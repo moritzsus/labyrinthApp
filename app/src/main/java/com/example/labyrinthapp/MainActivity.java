@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private static final String mpu_sub_topic = "mpu/M03";
     private static final String temp_sub_topic = "temp/M03";
     private static final String pub_topic = "finished/M03";
-    //TODO die IP-Adresse bitte in SharedPreferences (und über Menü änderbar)
+    //TODO die IP-Adresse bitte in SharedPreferences (und uber Menu aenderbar)
     //TODO BROKER -> broker?
     private String BROKER = "tcp://broker.emqx.io:1883";
     private EditText editTextBroker;
@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         // Initialisiere den SensorManager
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
-        // Überprüfe, ob das Gerät einen Rotationssensor hat
+        // uberprufe, ob das Gerat einen Rotationssensor hat
         gyroSensor = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
     }
 
@@ -132,7 +132,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     public void onBackPressed() {
-        // Zurück-Geste unterbinden, keine Aktion ausführen
+        // Back-Geste unterbinden, keine Aktion ausfuehren
     }
 
 
@@ -233,7 +233,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             editTextBroker = findViewById(R.id.editTextBroker);
             BROKER = editTextBroker.getText().toString();
             //TODO darf kein leerer String sein?
-            //TODO test wenn init broker wert ungültig
+            //TODO test wenn init broker wert ungueltig
             mqttHandler.setBroker(BROKER);
 
             //connect to new broker if inputMehod is MPU - if not, checking the radio button will automatically connect to new broker
@@ -408,7 +408,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
-        // Nicht benötigt, kann leer bleiben
     }
 
     /**

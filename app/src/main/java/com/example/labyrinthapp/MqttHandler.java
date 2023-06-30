@@ -34,7 +34,7 @@ public class MqttHandler {
             clientId = MqttClient.generateClientId();
             client = new MqttClient(broker, clientId, persistence);
             MqttConnectOptions connOpts = new MqttConnectOptions();
-            //TODO maybe here crash (port falsch -> aufhängen)?
+            //TODO maybe here crash (port falsch -> aufhangen)?
             connOpts.setCleanSession(true);
             Log.d("MQTT", "Connecting to broker: " + broker);
             connOpts.setConnectionTimeout(2000);
