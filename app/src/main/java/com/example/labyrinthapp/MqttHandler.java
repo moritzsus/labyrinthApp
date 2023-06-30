@@ -126,6 +126,7 @@ public class MqttHandler {
             client.publish(topic, message);
             Log.d("MQTT", "PUBLISHED FINISH");
         } catch (MqttException e) {
+            Log.d("MQTT", "PUBLISHED FAILED");
             e.printStackTrace();
         }
     }

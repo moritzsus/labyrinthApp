@@ -101,6 +101,7 @@ public class PlayerController {
 
         // Ziel
         if(playerPositionRow == labyrinth.length - 1 && playerPositionCol == labyrinth[0].length - 2) {
+
             if(level == 5) {
                 level++; // 6 means completed lv 5 (for SQL)
                 if(!GameScreenFragment.getInstance().getGameFinished())
@@ -154,6 +155,7 @@ public class PlayerController {
                     mp.start();
                 }
             }
+            MainActivity.getInstance().onLabyrinthFinished();
         }
     }
 
