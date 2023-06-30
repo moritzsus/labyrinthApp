@@ -158,10 +158,8 @@ public class GameScreenFragment extends Fragment {
         labyrinth[0][1] = 2;
         labyrinth[expandedRows - 1][expandedCols - 2] = 2;
 
-        // Erzeuge ein Labyrinth im inneren Bereich
-        //TODO comment drueber, und braucht man Zeile drunter?
         labyrinth[1][1] = 0;
-        carvePassages(1, 1);
+        carvePassages(1, 1); // inside the border
     }
 
     /**

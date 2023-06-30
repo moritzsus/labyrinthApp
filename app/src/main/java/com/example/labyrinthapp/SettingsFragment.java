@@ -14,6 +14,7 @@ import com.google.android.material.switchmaterial.SwitchMaterial;
 
 import java.util.Set;
 
+//TODO class javadoc
 public class SettingsFragment extends Fragment {
     private static SettingsFragment instance;
     RadioButton smartphonesensor;
