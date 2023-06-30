@@ -229,16 +229,22 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     public void onBrokerSaveClick(View view) {
+        if(inputMethod != InputMethodEnum.MPU6050)
+            return;
+
         try {
             editTextBroker = findViewById(R.id.editTextBroker);
             BROKER = editTextBroker.getText().toString();
-            //TODO darf kein leerer String sein?
+            if (BROKER.length() == 0)
+                return;
+            //TODO, wenn verbindung fehlschlaegt -> String back to before? (crasht wenn hin und her wechseln input)
             //TODO test wenn init broker wert ungueltig
             mqttHandler.setBroker(BROKER);
 
             //connect to new broker if inputMehod is MPU - if not, checking the radio button will automatically connect to new broker
             if(inputMethod == InputMethodEnum.MPU6050) {
                 //TODO fix crash when connecting to entered broker
+                // disconnecting bug when not connected?
                 mqttHandler.disconnect(mpu_sub_topic, temp_sub_topic);
 
                 mqttHandler.setBroker(BROKER);
@@ -287,6 +293,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public void onMPUClick(View view) {
         if(inputMethod == InputMethodEnum.MPU6050) return;
 
+        editTextBroker = findViewById(R.id.editTextBroker);
+        editTextBroker.setEnabled(true);
+        editTextBroker.setBackgroundResource(R.drawable.rounded_edittext_background_enabled);
+
         inputMethod = InputMethodEnum.MPU6050;
         mqttHandler.connect();
         mqttHandler.subscribe(mpu_sub_topic);
@@ -295,6 +305,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     public void onSmartphoneSensorClick(View view) {
         if(inputMethod == InputMethodEnum.SMARTPHONESENSOR) return;
+
+        editTextBroker = findViewById(R.id.editTextBroker);
+        editTextBroker.setEnabled(false);
+        editTextBroker.setBackgroundResource(R.drawable.rounded_edittext_background_disabled);
 
         inputMethod = InputMethodEnum.SMARTPHONESENSOR;
         mqttHandler.disconnect(mpu_sub_topic, temp_sub_topic);

@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.Switch;
 
@@ -14,21 +15,15 @@ import com.google.android.material.switchmaterial.SwitchMaterial;
 
 import java.util.Set;
 
-//TODO class javadoc
+/**
+ * A fragment that displays the settings.
+ * It allows the user to configure various settings.
+ */
 public class SettingsFragment extends Fragment {
-    private static SettingsFragment instance;
     RadioButton smartphonesensor;
     RadioButton mpu;
     SwitchMaterial soundSwitch;
-
-    /**
-     * Constructs an instance of the SettingsFragment class.
-     */
-    public SettingsFragment() {
-        instance = this;
-    }
-    //TODO muss singleton sein??
-    //TODO falls geaendert, auch javadoc anpassen
+    EditText brokerAddress;
 
     /**
      * Creates the views needed to display the settings screen, initializes
@@ -52,14 +47,17 @@ public class SettingsFragment extends Fragment {
         smartphonesensor = rootview.findViewById(R.id.radioButtonSPSens);
         mpu = rootview.findViewById(R.id.radioButtonMpu);
         soundSwitch = rootview.findViewById(R.id.soundSwitch);
+        brokerAddress = rootview.findViewById(R.id.editTextBroker);
 
         if(MainActivity.getInstance().getInputMethod() == MainActivity.InputMethodEnum.SMARTPHONESENSOR) {
             smartphonesensor.setChecked(true);
             mpu.setChecked(false);
+            brokerAddress.setEnabled(false);
         }
         else {
             smartphonesensor.setChecked(false);
             mpu.setChecked(true);
+            brokerAddress.setEnabled(true);
         }
 
         if(MainActivity.getInstance().getSoundOn())
@@ -72,4 +70,5 @@ public class SettingsFragment extends Fragment {
         rootview.requestFocus();
         return rootview;
     }
+
 }
