@@ -61,6 +61,8 @@ public class MqttHandler {
                 public void messageArrived(String topic, MqttMessage msg) throws Exception {
                     if(MainActivity.getInstance().getCurrentScreen() != MainActivity.ScreenEnum.GAMESCREEN)
                         return;
+                    if(GameScreenFragment.getInstance().getGameFinished())
+                        return;
 
                     if(firstMsg){
                         firstMsg = false;
