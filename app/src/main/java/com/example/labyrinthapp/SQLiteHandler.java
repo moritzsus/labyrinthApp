@@ -12,6 +12,9 @@ import java.util.ArrayList;
 import java.util.Currency;
 import java.util.List;
 
+/**
+ * The SQLiteHandler class is responsible for handling database operations for the leaderboard.
+ */
 public class SQLiteHandler extends SQLiteOpenHelper {
 
     public static final String LEADERBOARD_TABLE = "LEADERBOARD_TABLE";
@@ -20,10 +23,20 @@ public class SQLiteHandler extends SQLiteOpenHelper {
     public static final String COLUMN_LEVEL = "LEVEL";
     public static final String COLUMN_TIME = "TIME";
 
+    /**
+     * Constructs a new instance of the SQLiteHandler class.
+     *
+     * @param context The context of the application.
+     */
     public SQLiteHandler(@Nullable Context context) {
         super(context, "leaderboard.db", null, 1);
     }
 
+    /**
+     * Called when the database is created for the first time.
+     *
+     * @param sqLiteDatabase The SQLite database.
+     */
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         String createTableStatement = "CREATE TABLE " + LEADERBOARD_TABLE + " (" + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + COLUMN_PLAYER_NAME + " TEXT, " + COLUMN_LEVEL + " INT, " + COLUMN_TIME + " INT)";
@@ -31,11 +44,25 @@ public class SQLiteHandler extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL(createTableStatement);
     }
 
+    /**
+     * Called when the database needs to be upgraded.
+     *
+     * @param sqLiteDatabase The SQLite database.
+     * @param oldVersion     The old version of the database.
+     * @param newVersion     The new version of the database.
+     */
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
     }
 
-
+    /**
+     * Adds a player to the leaderboard table.
+     *
+     * @param name  The name of the player.
+     * @param level The level reached by the player.
+     * @param time  The completion time of the player.
+     * @return true if the player was successfully added, false otherwise.
+     */
     public boolean addPlayer(String name, int level, int time) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
@@ -53,6 +80,11 @@ public class SQLiteHandler extends SQLiteOpenHelper {
         return true;
     }
 
+    /**
+     * Retrieves the top 10 players from the leaderboard table.
+     *
+     * @return A list of Player objects representing the top 10 players in order.
+     */
     public List<Player> getTop10Players() {
         List<Player> topPlayers = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
@@ -85,10 +117,15 @@ public class SQLiteHandler extends SQLiteOpenHelper {
         return topPlayers;
     }
 
+    /**
+     * Gets the position of a given player in the leaderboard.
+     *
+     * @param player The player object.
+     * @return The position of the player in the leaderboard.
+     */
     public int getPlayerPosition(Player player) {
         SQLiteDatabase db = this.getReadableDatabase();
 
-        // Erstelle eine Abfrage, um die Position des Spielers zu ermitteln
         String query = "SELECT COUNT(*) + 1 AS position " +
                 "FROM " + LEADERBOARD_TABLE + " " +
                 "WHERE " + COLUMN_LEVEL + " > ? OR (" + COLUMN_LEVEL + " = ? AND " + COLUMN_TIME + " < ?)";

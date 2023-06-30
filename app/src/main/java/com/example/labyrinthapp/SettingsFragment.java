@@ -20,16 +20,29 @@ public class SettingsFragment extends Fragment {
     RadioButton mpu;
     SwitchMaterial soundSwitch;
 
+    /**
+     * Constructs an instance of the SettingsFragment class.
+     */
     public SettingsFragment() {
         instance = this;
     }
+    //TODO muss singleton sein??
+    //TODO falls geaendert, auch javadoc anpassen
 
-    public static SettingsFragment getInstance() {
-        if(instance == null)
-            return new SettingsFragment();
-        return instance;
-    }
-
+    /**
+     * Creates the views needed to display the settings screen, initializes
+     * their corresponding view variables and sets their states.
+     *
+     * @param inflater The LayoutInflater object that can be used to inflate
+     * any views in the fragment,
+     * @param container If non-null, this is the parent view that the fragment's
+     * UI should be attached to.  The fragment should not add the view itself,
+     * but this can be used to generate the LayoutParams of the view.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed
+     * from a previous saved state as given here.
+     *
+     * @return The View for the fragment's UI.
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -55,7 +68,6 @@ public class SettingsFragment extends Fragment {
 
         //TODO broker adresse mit ip einstellbar
         //TODO disable edittext when not mpu
-        // verhindert durchklicken auf darunterliegendes Fragment
         rootview.requestFocus();
         return rootview;
     }
