@@ -1,37 +1,22 @@
 package com.example.labyrinthapp;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentManager;
 
-import android.app.Fragment;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.media.MediaPlayer;
-import android.media.tv.BroadcastInfoRequest;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.RadioButton;
-import android.widget.Switch;
 import android.widget.TextView;
-
-import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
-import org.eclipse.paho.client.mqttv3.MqttClient;
-import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
-import org.eclipse.paho.client.mqttv3.MqttException;
-import org.eclipse.paho.client.mqttv3.MqttMessage;
-import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -56,14 +41,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private static final String mpu_sub_topic = "mpu/M03";
     private static final String temp_sub_topic = "temp/M03";
     private static final String pub_topic = "finished/M03";
-    //TODO die IP-Adresse bitte in SharedPreferences (und uber Menu aenderbar)
-    //TODO BROKER -> broker?
-    private String BROKER = "tcp://broker.emqx.io:1883";
+    private String broker;
     private EditText editTextBroker;
     private SensorManager sensorManager;
     private Sensor gyroSensor;
     private long lastSensorUpdate = 0;
-    private final long SENSOR_UPDATE_INTERVAL = 500; // Intervall in Millisekunden
+    private final long SENSOR_UPDATE_INTERVAL = 500;
     static private MainActivity instance;
     boolean firstSensorRead = true;
     private Timer tempTimer;
@@ -88,9 +71,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     .add(R.id.fragment_container_view, StartScreenFragment.class, null)
                     .commit();
         }
+        broker = getResources().getString(R.string.broker_address);
+
         soundOn = true;
         mqttHandler = new MqttHandler();
-        mqttHandler.setBroker(BROKER);
+        mqttHandler.setBroker(broker);
         // Initialisiere den SensorManager
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
@@ -151,8 +136,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         EditText name = StartScreenFragment.getInstance().getNameEditText();
         String nametxt = name.getText().toString();
         if(nametxt.length() == 0) {
+            name.setBackgroundResource(R.drawable.rounded_edittext_background_error);
+            MainActivity.getInstance().displayToast("Please enter your name.");
             return;
         }
+        name.setBackgroundResource(R.drawable.rounded_edittext_background_error);
+
         StartScreenFragment.getInstance().setPlayerName(nametxt);
 
         getSupportFragmentManager().beginTransaction()
@@ -192,11 +181,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         GameScreenFragment.getInstance().setGameFinished(false);
 
-        //TODO fix or delete
-        //String name = StartScreenFragment.getInstance().getNameString();
-        //Log.d("...", "NAME: " + name);
-        //EditText nameEditText = StartScreenFragment.getInstance().getNameEditText();
-        //nameEditText.setText("TESTNAME");
         currentScreen = ScreenEnum.STARTSCREEN;
     }
 
@@ -208,7 +192,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         getSupportFragmentManager().beginTransaction()
                 .setReorderingAllowed(true)
-                //hereadd
                 .add(R.id.fragment_container_view, SettingsFragment.class, null)
                 .addToBackStack(null)
                 .commit();
@@ -232,28 +215,28 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         if(inputMethod != InputMethodEnum.MPU6050)
             return;
 
+        String temp = broker;
         try {
             editTextBroker = findViewById(R.id.editTextBroker);
-            BROKER = editTextBroker.getText().toString();
-            if (BROKER.length() == 0)
+            broker = editTextBroker.getText().toString();
+            if (broker.length() == 0) {
+                broker = temp;
                 return;
-            //TODO, wenn verbindung fehlschlaegt -> String back to before? (crasht wenn hin und her wechseln input)
-            //TODO test wenn init broker wert ungueltig
-            mqttHandler.setBroker(BROKER);
+            }
+            mqttHandler.setBroker(broker);
 
             //connect to new broker if inputMehod is MPU - if not, checking the radio button will automatically connect to new broker
             if(inputMethod == InputMethodEnum.MPU6050) {
-                //TODO fix crash when connecting to entered broker
-                // disconnecting bug when not connected?
                 mqttHandler.disconnect(mpu_sub_topic, temp_sub_topic);
 
-                mqttHandler.setBroker(BROKER);
+                mqttHandler.setBroker(broker);
                 mqttHandler.connect();
                 mqttHandler.subscribe(mpu_sub_topic);
                 mqttHandler.subscribe(temp_sub_topic);
             }
         }
         catch (Exception e) {
+            broker = temp; // set back to default broker
             Log.d("d", "CANNOT CONNECT TO BROKER");
         }
 
@@ -293,6 +276,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public void onMPUClick(View view) {
         if(inputMethod == InputMethodEnum.MPU6050) return;
 
+        SettingsFragment.getInstance().setSaveButtonVisibility(true);
+
         editTextBroker = findViewById(R.id.editTextBroker);
         editTextBroker.setEnabled(true);
         editTextBroker.setBackgroundResource(R.drawable.rounded_edittext_background_enabled);
@@ -305,6 +290,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     public void onSmartphoneSensorClick(View view) {
         if(inputMethod == InputMethodEnum.SMARTPHONESENSOR) return;
+
+        SettingsFragment.getInstance().setSaveButtonVisibility(false);
 
         editTextBroker = findViewById(R.id.editTextBroker);
         editTextBroker.setEnabled(false);
@@ -323,7 +310,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         SQLiteHandler sqLiteHandler = new SQLiteHandler(this);
 
         String name = StartScreenFragment.getInstance().getPlayerName();
-        Log.d("NAME", "NAME: " + name);
 
         sqLiteHandler.addPlayer(name, PlayerController.getInstance().getLevel() - 1, GameScreenFragment.getInstance().getTime());
         onBestenlisteClick(null);
@@ -331,6 +317,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     public void onResignClick(View view) {
         onGameFinished();
+        if(soundOn){
+            MediaPlayer mp = GameScreenFragment.getInstance().getBackgroundMusicMediaPlayer();
+            mp.stop();
+        }
     }
 
     public void onRestartClick(View view) {
@@ -360,7 +350,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         if(inputMethod == InputMethodEnum.MPU6050 || GameScreenFragment.getInstance().getGameFinished())
             return;
 
-            // TODO falls Zeit accelerometer
         if(currentScreen == ScreenEnum.GAMESCREEN) {
             if (sensorEvent.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
                 long currentTime = System.currentTimeMillis();
@@ -387,7 +376,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             process.waitFor();
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String line = reader.readLine();
-            //TODO geht nicht auf simulator -> try catch?
             float temp = Float.parseFloat(line) / 1000.0f;
             Log.d("s", "CPU: " + temp);
             reader.close();
@@ -447,6 +435,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         t.start();
     }
 
+    public void displayToast(String msg) {
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+    }
+
     public void playConnectionSound() {
         if(!soundOn)
             return;
@@ -466,4 +458,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     public boolean getSoundOn() {return soundOn;}
+
+    public String getBrokerAddress() { return broker; }
+
+    public InputMethodEnum getSensorSource() { return inputMethod; }
 }

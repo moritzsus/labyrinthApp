@@ -18,8 +18,6 @@ import android.widget.TextView;
 public class StartScreenFragment extends Fragment {
     View rootview;
     private EditText editTextName;
-    //TODO fix or delete2
-    //TODO only red border if no input
     private String playerName = "NAME";
     static StartScreenFragment instance;
 
@@ -71,7 +69,7 @@ public class StartScreenFragment extends Fragment {
     }
 
     /**
-     * Sets the name entered in the start screen.
+     * Sets the playerName with the name entered in the start screen.
      * @param name The name entered in the start screen.
      */
     public void setPlayerName(String name) {

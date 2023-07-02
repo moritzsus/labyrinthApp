@@ -29,24 +29,26 @@ public class MqttHandler {
      * Connect to broker and
      */
     public void connect () {
-        //TODO toast anzeigen ob erfolgreich?
         try {
             clientId = MqttClient.generateClientId();
             client = new MqttClient(broker, clientId, persistence);
             MqttConnectOptions connOpts = new MqttConnectOptions();
-            //TODO maybe here crash (port falsch -> aufhangen)?
             connOpts.setCleanSession(true);
             Log.d("MQTT", "Connecting to broker: " + broker);
-            connOpts.setConnectionTimeout(2000);
             client.connect(connOpts);
             Log.d("MQTT", "Connected with broker: " + broker);
             MainActivity.getInstance().playConnectionSound();
+            MainActivity.getInstance().displayToast("Connected to broker.");
         } catch (MqttException me) {
             Log.e("MQTT", "Reason: " + me.getReasonCode());
             Log.e("MQTT", "Message: " + me.getMessage());
             Log.e("MQTT", "localizedMsg: " + me.getLocalizedMessage());
             Log.e("MQTT", "cause: " + me.getCause());
             Log.e("MQTT", "exception: " + me);
+            MainActivity.getInstance().displayToast("Could not connect to broker.");
+        }
+        catch (Exception e) {
+            MainActivity.getInstance().displayToast("Could not connect to broker.");
         }
     }
 
