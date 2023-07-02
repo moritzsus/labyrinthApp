@@ -9,6 +9,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.service.autofill.LuhnChecksumValidator;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -26,7 +27,6 @@ import java.util.TimerTask;
  */
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
 
-    //TODO strings etc in xml files
     /**
      * Enumeration for representing the current screen/fragment the application displays.
      */
@@ -378,9 +378,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         editTextBroker.setBackgroundResource(R.drawable.rounded_edittext_background_enabled);
 
         sensorSource = SensorSource.MPU6050;
-        mqttHandler.connect();
-        mqttHandler.subscribe(mpu_sub_topic);
-        mqttHandler.subscribe(temp_sub_topic);
+        try {
+            mqttHandler.connect();
+            mqttHandler.subscribe(mpu_sub_topic);
+            mqttHandler.subscribe(temp_sub_topic);
+        }
+        catch (Exception e) {
+            Log.d("s", "MPU CTACH");
+        }
     }
 
     /**
@@ -400,7 +405,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         editTextBroker.setBackgroundResource(R.drawable.rounded_edittext_background_disabled);
 
         sensorSource = SensorSource.SMARTPHONESENSOR;
-        mqttHandler.disconnect(mpu_sub_topic, temp_sub_topic);
+
+        try {
+            mqttHandler.disconnect(mpu_sub_topic, temp_sub_topic);
+        }
+        catch (Exception e) {
+            Log.d("S", "SM CLICK");
+        }
     }
 
     /**
