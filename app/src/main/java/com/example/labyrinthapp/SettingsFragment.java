@@ -7,14 +7,11 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.RadioButton;
-import android.widget.Switch;
 
 import com.google.android.material.switchmaterial.SwitchMaterial;
-
-import java.util.Set;
 
 /**
  * A fragment that displays the settings.
@@ -25,9 +22,8 @@ public class SettingsFragment extends Fragment {
     RadioButton mpu;
     SwitchMaterial soundSwitch;
     EditText brokerAddress;
-    Button saveButton;
+    ImageView saveButton;
     static SettingsFragment instance;
-    //TODO save button design
 
     /**
      * Constructs an instance of the SettingsFragment class.
@@ -73,24 +69,19 @@ public class SettingsFragment extends Fragment {
         brokerAddress.setText(MainActivity.getInstance().getBrokerAddress());
         saveButton = rootview.findViewById(R.id.buttonSave);
 
-        if(MainActivity.getInstance().getSensorSource() == MainActivity.InputMethodEnum.SMARTPHONESENSOR) {
-            brokerAddress.setBackgroundResource(R.drawable.rounded_edittext_background_disabled);
-            saveButton.setVisibility(View.INVISIBLE);
-        }
-        else {
-            brokerAddress.setBackgroundResource(R.drawable.rounded_edittext_background_enabled);
-            saveButton.setVisibility(View.VISIBLE);
-        }
-
-        if(MainActivity.getInstance().getInputMethod() == MainActivity.InputMethodEnum.SMARTPHONESENSOR) {
+        if(MainActivity.getInstance().getSensorSource() == MainActivity.SensorSource.SMARTPHONESENSOR) {
             smartphonesensor.setChecked(true);
             mpu.setChecked(false);
             brokerAddress.setEnabled(false);
+            brokerAddress.setBackgroundResource(R.drawable.rounded_edittext_background_disabled);
+            saveButton.setVisibility(View.INVISIBLE);
         }
         else {
             smartphonesensor.setChecked(false);
             mpu.setChecked(true);
             brokerAddress.setEnabled(true);
+            brokerAddress.setBackgroundResource(R.drawable.rounded_edittext_background_enabled);
+            saveButton.setVisibility(View.VISIBLE);
         }
 
         if(MainActivity.getInstance().getSoundOn())

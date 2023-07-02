@@ -135,4 +135,11 @@ public class MqttHandler {
     public void setBroker(String brokerAddress) {
         broker = brokerAddress;
     }
+
+    /**
+     * Resets the firstMsg variable to true.
+     */
+    public void resetFirstRead() {
+        firstMsg = true;
+    }
 }

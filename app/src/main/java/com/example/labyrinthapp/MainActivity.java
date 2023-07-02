@@ -39,11 +39,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     /**
      * Enumeration for representing the current sensor source of the movement data.
      */
-    //TODO rename?
-    public enum InputMethodEnum {
+    public enum SensorSource {
         MPU6050, SMARTPHONESENSOR
     }
-    InputMethodEnum inputMethod = InputMethodEnum.SMARTPHONESENSOR;;
+    SensorSource sensorSource = SensorSource.SMARTPHONESENSOR;;
     private String TAG = MainActivity.class.getSimpleName();
 
     //TODO change topics to M02
@@ -121,7 +120,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     protected void onResume() {
         super.onResume();
 
-        if(inputMethod == InputMethodEnum.MPU6050) {
+        if(sensorSource == SensorSource.MPU6050) {
             mqttHandler.connect();
             mqttHandler.subscribe(mpu_sub_topic);
             mqttHandler.subscribe(temp_sub_topic);
@@ -129,7 +128,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         if (gyroSensor != null) {
             sensorManager.registerListener(this, gyroSensor, SensorManager.SENSOR_DELAY_NORMAL);
         }
-        if(currentScreen == ScreenEnum.GAMESCREEN && inputMethod == InputMethodEnum.SMARTPHONESENSOR) {
+        if(currentScreen == ScreenEnum.GAMESCREEN && sensorSource == SensorSource.SMARTPHONESENSOR) {
             if(tempTimer != null)
                 startTemperatureTimer();
         }
@@ -143,12 +142,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     protected void onPause() {
         super.onPause();
-        if(inputMethod == InputMethodEnum.MPU6050) {
+        if(sensorSource == SensorSource.MPU6050) {
             mqttHandler.disconnect(mpu_sub_topic, temp_sub_topic);
         }
         sensorManager.unregisterListener(this);
 
-        if(currentScreen == ScreenEnum.GAMESCREEN && inputMethod == InputMethodEnum.SMARTPHONESENSOR) {
+        if(currentScreen == ScreenEnum.GAMESCREEN && sensorSource == SensorSource.SMARTPHONESENSOR) {
             if(tempTimer != null)
                 tempTimer.cancel();
         }
@@ -173,8 +172,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
      * Gets the current sensor source of the movement data.
      * @return The current sensor source of the movement data.
      */
-    public InputMethodEnum getInputMethod() {
-        return inputMethod;
+    public SensorSource getSensorSource() {
+        return sensorSource;
     }
 
     /**
@@ -205,7 +204,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         PlayerController.getInstance().resetLevel();
 
-        if(inputMethod == InputMethodEnum.SMARTPHONESENSOR) {
+        if(sensorSource == SensorSource.SMARTPHONESENSOR) {
             startTemperatureTimer();
         }
         currentScreen = MainActivity.ScreenEnum.GAMESCREEN;
@@ -224,6 +223,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         GameScreenFragment.getInstance().setLabyrinthSize(8,8);
         firstSensorRead = true;
+        mqttHandler.resetFirstRead();
 
         getSupportFragmentManager().beginTransaction()
                 .setReorderingAllowed(true)
@@ -231,7 +231,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 .addToBackStack(null)
                 .commit();
 
-        if(currentScreen == ScreenEnum.GAMESCREEN && inputMethod == InputMethodEnum.SMARTPHONESENSOR) {
+        if(currentScreen == ScreenEnum.GAMESCREEN && sensorSource == SensorSource.SMARTPHONESENSOR) {
             if(tempTimer != null) {
                 tempTimer.cancel();
                 firstTempRead = true;
@@ -262,7 +262,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 .addToBackStack(null)
                 .commit();
 
-        if(currentScreen == ScreenEnum.GAMESCREEN && inputMethod == InputMethodEnum.SMARTPHONESENSOR) {
+        if(currentScreen == ScreenEnum.GAMESCREEN && sensorSource == SensorSource.SMARTPHONESENSOR) {
             if(tempTimer != null)
                 tempTimer.cancel();
         }
@@ -291,7 +291,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
      * @param view The view that was clicked (the "Save" button).
      */
     public void onBrokerSaveClick(View view) {
-        if(inputMethod != InputMethodEnum.MPU6050)
+        if(sensorSource != SensorSource.MPU6050)
             return;
 
         try {
@@ -303,7 +303,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             mqttHandler.setBroker(broker);
 
             //connect to new broker if inputMehod is MPU - if not, checking the radio button will automatically connect to new broker
-            if(inputMethod == InputMethodEnum.MPU6050) {
+            if(sensorSource == SensorSource.MPU6050) {
                 mqttHandler.disconnect(mpu_sub_topic, temp_sub_topic);
 
                 mqttHandler.setBroker(broker);
@@ -329,7 +329,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         currentScreen = lastScreen;
         getSupportFragmentManager().popBackStack();
 
-        if(currentScreen == ScreenEnum.GAMESCREEN && inputMethod == InputMethodEnum.SMARTPHONESENSOR) {
+        if(currentScreen == ScreenEnum.GAMESCREEN && sensorSource == SensorSource.SMARTPHONESENSOR) {
             if(tempTimer != null)
                 startTemperatureTimer();
         }
@@ -355,7 +355,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 .addToBackStack(null)
                 .commit();
 
-        if(currentScreen == ScreenEnum.GAMESCREEN && inputMethod == InputMethodEnum.SMARTPHONESENSOR) {
+        if(currentScreen == ScreenEnum.GAMESCREEN && sensorSource == SensorSource.SMARTPHONESENSOR) {
             if(tempTimer != null)
                 tempTimer.cancel();
         }
@@ -370,7 +370,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
      * @param view The view that was clicked (the "MPU" radio button).
      */
     public void onMPUClick(View view) {
-        if(inputMethod == InputMethodEnum.MPU6050) return;
+        if(sensorSource == SensorSource.MPU6050) return;
 
         SettingsFragment.getInstance().setSaveButtonVisibility(true);
 
@@ -378,7 +378,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         editTextBroker.setEnabled(true);
         editTextBroker.setBackgroundResource(R.drawable.rounded_edittext_background_enabled);
 
-        inputMethod = InputMethodEnum.MPU6050;
+        sensorSource = SensorSource.MPU6050;
         mqttHandler.connect();
         mqttHandler.subscribe(mpu_sub_topic);
         mqttHandler.subscribe(temp_sub_topic);
@@ -392,7 +392,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
      * @param view The view that was clicked (the "Smartphone Sensors" radio button).
      */
     public void onSmartphoneSensorClick(View view) {
-        if(inputMethod == InputMethodEnum.SMARTPHONESENSOR) return;
+        if(sensorSource == SensorSource.SMARTPHONESENSOR) return;
 
         SettingsFragment.getInstance().setSaveButtonVisibility(false);
 
@@ -400,15 +400,17 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         editTextBroker.setEnabled(false);
         editTextBroker.setBackgroundResource(R.drawable.rounded_edittext_background_disabled);
 
-        inputMethod = InputMethodEnum.SMARTPHONESENSOR;
+        sensorSource = SensorSource.SMARTPHONESENSOR;
         mqttHandler.disconnect(mpu_sub_topic, temp_sub_topic);
     }
 
+    /**
+     * Handles the logic when the game is finished.
+     * This method marks the game as finished,
+     * saves the player's score and time to the SQLite database using the SQLiteHandler,
+     * and navigates to the leaderboard to display the leaderboard.
+     */
     public void onGameFinished() {
-        //TODO only when MPU is connected -> crash
-        //TODO javadoc anpassen
-        //mqttHandler.publish(pub_topic, "Game Finished");
-
         GameScreenFragment.getInstance().setGameFinished(true);
 
         SQLiteHandler sqLiteHandler = new SQLiteHandler(this);
@@ -419,8 +421,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         onBestenlisteClick(null);
     }
 
+    /**
+     * If the sensor source is set to MPU6050, this method creates a new thread
+     * to publish a message indicating the labyrinth is finished using the MQTTHandler.
+     */
     public void onLabyrinthFinished() {
-        if (inputMethod == InputMethodEnum.MPU6050) {
+        if (sensorSource == SensorSource.MPU6050) {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -453,12 +459,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
      * @param view The view that was clicked (the "Restart" button).
      */
     public void onRestartClick(View view) {
-        if(currentScreen == ScreenEnum.GAMESCREEN && inputMethod == InputMethodEnum.SMARTPHONESENSOR) {
+        if(currentScreen == ScreenEnum.GAMESCREEN && sensorSource == SensorSource.SMARTPHONESENSOR) {
             if(tempTimer != null) {
                 tempTimer.cancel();
                 firstTempRead = true;
             }
         }
+        mqttHandler.resetFirstRead();
+
         GameScreenFragment.getInstance().setGameFinished(false);
 
         getSupportFragmentManager().beginTransaction()
@@ -469,7 +477,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         PlayerController.getInstance().resetLevel();
 
-        if(inputMethod == InputMethodEnum.SMARTPHONESENSOR) {
+        if(sensorSource == SensorSource.SMARTPHONESENSOR) {
             startTemperatureTimer();
         }
     }
@@ -484,7 +492,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
      */
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
-        if(inputMethod == InputMethodEnum.MPU6050 || GameScreenFragment.getInstance().getGameFinished())
+        if(sensorSource == SensorSource.MPU6050 || GameScreenFragment.getInstance().getGameFinished())
             return;
 
         if(currentScreen == ScreenEnum.GAMESCREEN) {
@@ -623,10 +631,4 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
      * @return A String holding the broker address.
      */
     public String getBrokerAddress() { return broker; }
-
-    /**
-     * Gets the current sensor source (MPU6050 or Smartphone Sensors).
-     * @return The current sensor source (MPU6050 or Smartphone Sensors).
-     */
-    public InputMethodEnum getSensorSource() { return inputMethod; }
 }
