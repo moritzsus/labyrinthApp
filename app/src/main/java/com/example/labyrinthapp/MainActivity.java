@@ -45,11 +45,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     SensorSource sensorSource = SensorSource.SMARTPHONESENSOR;;
     private String TAG = MainActivity.class.getSimpleName();
 
-    //TODO change topics to M02
     MqttHandler mqttHandler;
-    private static final String mpu_sub_topic = "mpu/M03";
-    private static final String temp_sub_topic = "temp/M03";
-    private static final String pub_topic = "finished/M03";
+    private static final String mpu_sub_topic = "mpu/M02";
+    private static final String temp_sub_topic = "temp/M02";
+    private static final String pub_topic = "finished/M02";
     private String broker;
     private EditText editTextBroker;
     private SensorManager sensorManager;
