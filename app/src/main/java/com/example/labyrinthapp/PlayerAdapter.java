@@ -10,13 +10,29 @@ import android.widget.TextView;
 
 import java.util.List;
 
+/**
+ * A custom ArrayAdapter for displaying Player objects in a ListView.
+ */
 public class PlayerAdapter extends ArrayAdapter<Player> {
-    // Konstruktor
+
+    /**
+     * Constructs a new PlayerAdapter.
+     * @param context The context.
+     * @param resource The resource ID for the layout file.
+     * @param items The list of Player objects.
+     */
     public PlayerAdapter(Context context, int resource, List<Player> items) {
         super(context, resource, items);
     }
 
-    // Überschreibe die getView-Methode
+    /**
+     * Gets a View that displays the player data which it queries from the player
+     * SQLite database and sets it at the specified position in the data set.
+     * @param position The position of the item within the adapter's data set.
+     * @param convertView The old view to reuse, if possible.
+     * @param parent The parent that this view will eventually be attached to.
+     * @return A View corresponding to the data at the specified position.
+     */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View view = convertView;
@@ -46,6 +62,5 @@ public class PlayerAdapter extends ArrayAdapter<Player> {
 
         return view;
     }
-
 }
 

@@ -7,6 +7,8 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.Switch;
 
@@ -14,22 +16,51 @@ import com.google.android.material.switchmaterial.SwitchMaterial;
 
 import java.util.Set;
 
+/**
+ * A fragment that displays the settings.
+ * It allows the user to configure various settings.
+ */
 public class SettingsFragment extends Fragment {
-    private static SettingsFragment instance;
     RadioButton smartphonesensor;
     RadioButton mpu;
     SwitchMaterial soundSwitch;
+    EditText brokerAddress;
+    Button saveButton;
+    static SettingsFragment instance;
+    //TODO save button design
 
+    /**
+     * Constructs an instance of the SettingsFragment class.
+     */
     public SettingsFragment() {
         instance = this;
     }
 
-    public static SettingsFragment getInstance() {
-        if(instance == null)
+    /**
+     * Gets an instance of the SettingsFragment class.
+     * @return An instance of the SettingsFragment class.
+     */
+    static SettingsFragment getInstance() {
+        if(SettingsFragment.instance == null)
             return new SettingsFragment();
+
         return instance;
     }
 
+    /**
+     * Creates the views needed to display the settings screen, initializes
+     * their corresponding view variables and sets their states.
+     *
+     * @param inflater The LayoutInflater object that can be used to inflate
+     * any views in the fragment,
+     * @param container If non-null, this is the parent view that the fragment's
+     * UI should be attached to.  The fragment should not add the view itself,
+     * but this can be used to generate the LayoutParams of the view.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed
+     * from a previous saved state as given here.
+     *
+     * @return The View for the fragment's UI.
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -38,14 +69,28 @@ public class SettingsFragment extends Fragment {
         smartphonesensor = rootview.findViewById(R.id.radioButtonSPSens);
         mpu = rootview.findViewById(R.id.radioButtonMpu);
         soundSwitch = rootview.findViewById(R.id.soundSwitch);
+        brokerAddress = rootview.findViewById(R.id.editTextBroker);
+        brokerAddress.setText(MainActivity.getInstance().getBrokerAddress());
+        saveButton = rootview.findViewById(R.id.buttonSave);
+
+        if(MainActivity.getInstance().getSensorSource() == MainActivity.InputMethodEnum.SMARTPHONESENSOR) {
+            brokerAddress.setBackgroundResource(R.drawable.rounded_edittext_background_disabled);
+            saveButton.setVisibility(View.INVISIBLE);
+        }
+        else {
+            brokerAddress.setBackgroundResource(R.drawable.rounded_edittext_background_enabled);
+            saveButton.setVisibility(View.VISIBLE);
+        }
 
         if(MainActivity.getInstance().getInputMethod() == MainActivity.InputMethodEnum.SMARTPHONESENSOR) {
             smartphonesensor.setChecked(true);
             mpu.setChecked(false);
+            brokerAddress.setEnabled(false);
         }
         else {
             smartphonesensor.setChecked(false);
             mpu.setChecked(true);
+            brokerAddress.setEnabled(true);
         }
 
         if(MainActivity.getInstance().getSoundOn())
@@ -53,10 +98,18 @@ public class SettingsFragment extends Fragment {
         else
             soundSwitch.setChecked(false);
 
-        //TODO broker adresse mit ip einstellbar
-        //TODO disable edittext when not mpu
-        // verhindert durchklicken auf darunterliegendes Fragment
         rootview.requestFocus();
         return rootview;
+    }
+
+    /**
+     * Sets the visibility of the save button.
+     * @param visible Tells the method if the save button should be visible or not.
+     */
+    public void setSaveButtonVisibility(boolean visible) {
+        if(visible)
+            saveButton.setVisibility(View.VISIBLE);
+        else
+            saveButton.setVisibility(View.INVISIBLE);
     }
 }
