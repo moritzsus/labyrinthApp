@@ -53,7 +53,6 @@ public class GameScreenFragment extends Fragment {
 
         return instance;
     }
-    //TODO button designs
 
     /**
      * Creates the views needed to display the game screen and initializes
