@@ -4,16 +4,11 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.widget.ImageView;
 
 import androidx.appcompat.widget.AppCompatImageView;
-
-import java.text.AttributedCharacterIterator;
 
 /**
  * Custom view for displaying a labyrinth.
@@ -78,7 +73,7 @@ public class LabyrinthView extends AppCompatImageView {
                 entranceTexture = BitmapFactory.decodeResource(getResources(), R.drawable.stage5_entrance);
                 break;
             default:
-                Log.d("s", "INVALID LEVEL");
+                Log.d("LabyrinthView", "Invalid Level.");
         }
 
         PlayerController.getInstance().setLabyrinth(labyrinth);

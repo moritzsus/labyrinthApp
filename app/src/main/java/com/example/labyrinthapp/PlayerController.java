@@ -1,10 +1,6 @@
 package com.example.labyrinthapp;
 
-import android.graphics.Paint;
 import android.media.MediaPlayer;
-import android.telecom.Call;
-import android.util.Log;
-import android.view.View;
 
 /**
  * The PlayerController (Singleton) class handles the movement and control of the player in the labyrinth game.
@@ -87,9 +83,6 @@ public class PlayerController {
      * @param y The rotation value in the y-axis.
      */
     public void movePlayer(float x, float y) {
-        if(labyrinthView == null) {
-            Log.d("Rotationswerte", "LABVEW NULL");
-        }
 
         // Movement paused (e.g. when in Settings screen)
         if(MainActivity.getInstance().getCurrentScreen() != MainActivity.ScreenEnum.GAMESCREEN) {

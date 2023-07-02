@@ -1,10 +1,6 @@
 package com.example.labyrinthapp;
 
-import android.app.GameManager;
 import android.util.Log;
-import android.widget.TextView;
-
-import androidx.fragment.app.Fragment;
 
 import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
 import org.eclipse.paho.client.mqttv3.MqttClient;
@@ -18,15 +14,12 @@ public class MqttHandler {
     private MqttClient client;
     private MemoryPersistence persistence = new MemoryPersistence();
     private int qos = 0;
-    private String broker = "x";
+    private String broker = "-";
     boolean firstMsg = true;
 
-    public void setBroker(String brokerAddress) {
-        broker = brokerAddress;
-    }
-
     /**
-     * Connect to broker and
+     * Connect to broker.
+     * The broker address should be set with setBroker() before connecting.
      */
     public void connect () {
         try {
@@ -53,8 +46,8 @@ public class MqttHandler {
     }
 
     /**
-     * Subscribes to a given topic
-     * @param topic Topic to subscribe to
+     * Subscribes to a given topic.
+     * @param topic Topic to subscribe to.
      */
     public void subscribe(String topic) {
         try {
@@ -97,7 +90,7 @@ public class MqttHandler {
 
     /**
      * Unsubscribe from default topic (please unsubscribe from further
-     * topics prior to calling this function)
+     * topics prior to calling this function).
      */
     public void disconnect(String mpu_topic, String temp_topic) {
         try {
@@ -117,18 +110,26 @@ public class MqttHandler {
     }
 
     /**
-     * Publishes a message via MQTT (with fixed topic)
-     * @param topic topic to publish with
-     * @param msg message to publish with publish topic
+     * Publishes a message via MQTT (with fixed topic).
+     * @param topic topic to publish with.
+     * @param msg message to publish with publish topic.
      */
     public void publish(String topic, String msg) {
         MqttMessage message = new MqttMessage(msg.getBytes());
         message.setQos(qos);
         try {
             client.publish(topic, message);
-            Log.d("MQTT", "PUBLISHED FINISH");
+            Log.d("MQTT", "Published message.");
         } catch (MqttException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Sets the brokerAddress to the given String.
+     * @param brokerAddress The brokerAddress.
+     */
+    public void setBroker(String brokerAddress) {
+        broker = brokerAddress;
     }
 }
