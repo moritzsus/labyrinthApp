@@ -56,6 +56,8 @@ public class MqttHandler {
                 public void messageArrived(String topic, MqttMessage msg) throws Exception {
                     if(MainActivity.getInstance().getCurrentScreen() != MainActivity.ScreenEnum.GAMESCREEN)
                         return;
+                    if(GameScreenFragment.getInstance().getGameFinished())
+                        return;
 
                     if(firstMsg){
                         firstMsg = false;
@@ -121,6 +123,7 @@ public class MqttHandler {
             client.publish(topic, message);
             Log.d("MQTT", "Published message.");
         } catch (MqttException e) {
+            Log.d("MQTT", "PUBLISHED FAILED");
             e.printStackTrace();
         }
     }

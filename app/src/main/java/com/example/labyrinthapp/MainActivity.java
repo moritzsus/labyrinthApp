@@ -419,6 +419,17 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         onBestenlisteClick(null);
     }
 
+    public void onLabyrinthFinished() {
+        if (inputMethod == InputMethodEnum.MPU6050) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    mqttHandler.publish(pub_topic, "Labyrinth Finished");
+                }
+            }).start();
+        }
+    }
+
     /**
      * Handles the click event on the "Resign" button in the view.
      * This method is called when the "Resign" button is clicked.
