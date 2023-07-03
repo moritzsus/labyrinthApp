@@ -1,7 +1,6 @@
 package com.example.labyrinthapp;
 
 import android.content.Context;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,18 +42,18 @@ public class PlayerAdapter extends ArrayAdapter<Player> {
 
         Player player = getItem(position);
 
-        TextView positionTextView = (TextView) view.findViewById(R.id.lv_positionTextView);
-        TextView nameTextView = (TextView) view.findViewById(R.id.lv_nameTextView);
-        TextView levelTextView = (TextView) view.findViewById(R.id.lv_levelTextView);
-        TextView timeTextView = (TextView) view.findViewById(R.id.lv_timeTextView);
+        TextView positionTextView = view.findViewById(R.id.lv_positionTextView);
+        TextView nameTextView = view.findViewById(R.id.lv_nameTextView);
+        TextView levelTextView =  view.findViewById(R.id.lv_levelTextView);
+        TextView timeTextView = view.findViewById(R.id.lv_timeTextView);
 
         if(GameScreenFragment.getInstance().getGameFinished()) {
             SQLiteHandler sqLiteHandler = new SQLiteHandler(MainActivity.getInstance());
             int pos = sqLiteHandler.getPlayerPosition(player);
-            positionTextView.setText(String.valueOf(pos) + ".");
+            positionTextView.setText(pos + ".");
         }
         else {
-            positionTextView.setText(String.valueOf(position + 1) + ".");
+            positionTextView.setText(position + 1 + ".");
         }
         nameTextView.setText(player.getName());
         levelTextView.setText(String.valueOf(player.getLevel()));

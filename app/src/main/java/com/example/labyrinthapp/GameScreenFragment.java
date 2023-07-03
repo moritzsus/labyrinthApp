@@ -28,7 +28,7 @@ public class GameScreenFragment extends Fragment {
     private int rows = 8;
     private int cols = 8;
     private int[][] labyrinth;
-    private MediaPlayer musicPlayer;
+    private final MediaPlayer musicPlayer;
     static GameScreenFragment instance;
 
     /**

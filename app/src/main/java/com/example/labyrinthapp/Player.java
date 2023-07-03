@@ -4,9 +4,9 @@ package com.example.labyrinthapp;
  * Player class which represents a player with its level and completion time.
  */
 public class Player {
-    private String name;
-    private int level;
-    private int time;
+    private final String name;
+    private final int level;
+    private final int time;
 
     /**
      * Constructs a new player with the given values.

@@ -17,8 +17,8 @@ public class PlayerController {
     Direction direction = Direction.NONE;
     private int[][] labyrinth;
     LabyrinthView labyrinthView;
-    private float verticalDeazone = 0.4f;
-    private float horizontalDeazone = 0.5f;
+    private final float verticalDeazone = 0.4f;
+    private final float horizontalDeazone = 0.5f;
     private int level = 1;
 
     /**

@@ -84,10 +84,7 @@ public class SettingsFragment extends Fragment {
             saveButton.setVisibility(View.VISIBLE);
         }
 
-        if(MainActivity.getInstance().getSoundOn())
-            soundSwitch.setChecked(true);
-        else
-            soundSwitch.setChecked(false);
+        soundSwitch.setChecked(MainActivity.getInstance().getSoundOn());
 
         rootview.requestFocus();
         return rootview;

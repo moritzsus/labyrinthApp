@@ -128,6 +128,7 @@ public class LabyrinthView extends AppCompatImageView {
                 float right = left + cellSize;
                 float bottom = top + cellSize;
 
+
                 if(labyrinth[i][j] == 0) {
                     canvas.drawBitmap(pathTexture, null, new RectF(left + (viewWidth / 8), top, right + (viewWidth / 8), bottom), null);
                 }

@@ -9,7 +9,6 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.service.autofill.LuhnChecksumValidator;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -42,8 +41,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public enum SensorSource {
         MPU6050, SMARTPHONESENSOR
     }
-    SensorSource sensorSource = SensorSource.SMARTPHONESENSOR;;
-    private String TAG = MainActivity.class.getSimpleName();
+    SensorSource sensorSource = SensorSource.SMARTPHONESENSOR;
+    private final String TAG = MainActivity.class.getSimpleName();
 
     MqttHandler mqttHandler;
     private static final String mpu_sub_topic = "mpu/M02";
@@ -384,7 +383,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             mqttHandler.subscribe(temp_sub_topic);
         }
         catch (Exception e) {
-            Log.d("s", "MPU CTACH");
+            Log.d(TAG, "Could ned reconnect.");
         }
     }
 
@@ -410,7 +409,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             mqttHandler.disconnect(mpu_sub_topic, temp_sub_topic);
         }
         catch (Exception e) {
-            Log.d("S", "SM CLICK");
+            Log.d(TAG, "Could not disconnect.");
         }
     }
 
@@ -424,7 +423,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         GameScreenFragment.getInstance().setGameFinished(true);
 
         SQLiteHandler sqLiteHandler = new SQLiteHandler(this);
-
         String name = StartScreenFragment.getInstance().getPlayerName();
 
         sqLiteHandler.addPlayer(name, PlayerController.getInstance().getLevel() - 1, GameScreenFragment.getInstance().getTime());
@@ -541,7 +539,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             reader.close();
             return temp;
         } catch (Exception e) {
-            Log.d("CPU Temperature", "Could not read CPU temperature.");
+            Log.d(TAG, "Could not read CPU temperature.");
             e.printStackTrace();
         }
         return 0.0f;
@@ -598,7 +596,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                             }
                     });
 
-                } catch (Exception e) { }
+                } catch (Exception e) {
+                    Log.d(TAG, "Failed to display textView.");
+                }
             }
         };
         t.start();
