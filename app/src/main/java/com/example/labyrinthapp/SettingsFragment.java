@@ -1,5 +1,6 @@
 package com.example.labyrinthapp;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -23,6 +24,7 @@ public class SettingsFragment extends Fragment {
     SwitchMaterial soundSwitch;
     EditText brokerAddress;
     ImageView saveButton;
+    @SuppressLint("StaticFieldLeak") // see documentation
     static SettingsFragment instance;
 
     /**

@@ -2,7 +2,6 @@ package com.example.labyrinthapp;
 
 import android.util.Log;
 
-import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -10,10 +9,9 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 public class MqttHandler {
-    private String clientId;
     private MqttClient client;
-    private MemoryPersistence persistence = new MemoryPersistence();
-    private int qos = 0;
+    private final MemoryPersistence persistence = new MemoryPersistence();
+    private final int qos = 0;
     private String broker = "-";
     boolean firstMsg = true;
 
@@ -23,7 +21,7 @@ public class MqttHandler {
      */
     public void connect () {
         try {
-            clientId = MqttClient.generateClientId();
+            String clientId = MqttClient.generateClientId();
             client = new MqttClient(broker, clientId, persistence);
             MqttConnectOptions connOpts = new MqttConnectOptions();
             connOpts.setCleanSession(true);
@@ -51,37 +49,34 @@ public class MqttHandler {
      */
     public void subscribe(String topic) {
         try {
-            client.subscribe(topic, qos, new IMqttMessageListener() {
-                @Override
-                public void messageArrived(String topic, MqttMessage msg) throws Exception {
-                    if(MainActivity.getInstance().getCurrentScreen() != MainActivity.ScreenEnum.GAMESCREEN)
-                        return;
-                    if(GameScreenFragment.getInstance().getGameFinished())
-                        return;
+            client.subscribe(topic, qos, (topic1, msg) -> {
+                if(MainActivity.getInstance().getCurrentScreen() != MainActivity.ScreenEnum.GAMESCREEN)
+                    return;
+                if(GameScreenFragment.getInstance().getGameFinished())
+                    return;
 
-                    if(firstMsg){
-                        firstMsg = false;
-                        return;
-                    }
-                    String message = new String(msg.getPayload());
-                    String[] values = message.split(",");
+                if(firstMsg){
+                    firstMsg = false;
+                    return;
+                }
+                String message = new String(msg.getPayload());
+                String[] values = message.split(",");
 
-                    // length 6 = Bewegungssensordaten
-                    if(values.length == 6) {
-                        float x = Float.parseFloat(values[3]);
-                        float y = Float.parseFloat(values[4]);
+                // length 6 = Bewegungssensordaten
+                if(values.length == 6) {
+                    float x = Float.parseFloat(values[3]);
+                    float y = Float.parseFloat(values[4]);
 
-                        PlayerController.getInstance().movePlayer(x, y);
-                    }
-                    //length 2 = counter und Temperatur
-                    if(values.length == 2) {
-                        String temp = values[1].trim().substring(0, 4);
+                    PlayerController.getInstance().movePlayer(x, y);
+                }
+                //length 2 = counter und Temperatur
+                if(values.length == 2) {
+                    String temp = values[1].trim().substring(0, 4);
 
-                        GameScreenFragment gamescreen = GameScreenFragment.getInstance();
-                        gamescreen.setTemperature(temp);
-                        gamescreen.increaseCounter();
-                        gamescreen.setTimer();
-                    }
+                    GameScreenFragment gamescreen = GameScreenFragment.getInstance();
+                    gamescreen.setTemperature(temp);
+                    gamescreen.increaseCounter();
+                    gamescreen.setTimer();
                 }
             });
             Log.d("MQTT", "subscribed to topic " + topic);

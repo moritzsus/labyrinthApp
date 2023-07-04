@@ -1,5 +1,7 @@
 package com.example.labyrinthapp;
 
+import androidx.annotation.NonNull;
+
 /**
  * Player class which represents a player with its level and completion time.
  */
@@ -24,6 +26,7 @@ public class Player {
      * Returns a String representation of a player.
      * @return String representation of a player.
      */
+    @NonNull
     @Override
     public String toString() {
         return "Player{" +

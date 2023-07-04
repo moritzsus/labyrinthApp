@@ -1,5 +1,6 @@
 package com.example.labyrinthapp;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -95,6 +96,7 @@ public class LabyrinthView extends AppCompatImageView {
      * Calculates the size of the quads which then form the labyrinth.
      * @param canvas Canvas to be drawn on.
      */
+    @SuppressLint("DrawAllocation")
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
@@ -129,14 +131,15 @@ public class LabyrinthView extends AppCompatImageView {
                 float bottom = top + cellSize;
 
 
+                // Rects have to be drawn inside onDraw(), because the function determines where to draw which rectangle
                 if(labyrinth[i][j] == 0) {
-                    canvas.drawBitmap(pathTexture, null, new RectF(left + (viewWidth / 8), top, right + (viewWidth / 8), bottom), null);
+                    canvas.drawBitmap(pathTexture, null, new RectF(left + (viewWidth / 8.0f), top, right + (viewWidth / 8.0f), bottom), null);
                 }
                 else if(labyrinth[i][j] == 1) {
-                    canvas.drawBitmap(wallTexture, null, new RectF(left + (viewWidth / 8), top, right + (viewWidth / 8), bottom), null);
+                    canvas.drawBitmap(wallTexture, null, new RectF(left + (viewWidth / 8.0f), top, right + (viewWidth / 8.0f), bottom), null);
                 }
                 else {
-                    canvas.drawBitmap(entranceTexture, null, new RectF(left + (viewWidth / 8), top, right + (viewWidth / 8), bottom), null);
+                    canvas.drawBitmap(entranceTexture, null, new RectF(left + (viewWidth / 8.0f), top, right + (viewWidth / 8.0f), bottom), null);
                 }
             }
         }
@@ -150,7 +153,7 @@ public class LabyrinthView extends AppCompatImageView {
      * @param labY Y-value (column) of the player in the labyrinth.
      */
     private void drawPlayer(int labX, int labY) {
-        float left = labY * cellSize + (getWidth() / 8);
+        float left = labY * cellSize + (getWidth() / 8.0f);
         float top = labX * cellSize;
         float right = left + cellSize;
         float bottom = top + cellSize;

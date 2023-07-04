@@ -1,5 +1,6 @@
 package com.example.labyrinthapp;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -17,6 +18,7 @@ public class StartScreenFragment extends Fragment {
     View rootview;
     private EditText editTextName;
     private String playerName = "NAME";
+    @SuppressLint("StaticFieldLeak") // see documentation
     static StartScreenFragment instance;
 
     /**

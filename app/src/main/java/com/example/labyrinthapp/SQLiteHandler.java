@@ -73,10 +73,7 @@ public class SQLiteHandler extends SQLiteOpenHelper {
         long insert = db.insert(LEADERBOARD_TABLE,  null, cv);
         db.close();
 
-        if(insert == -1)
-            return  false;
-
-        return true;
+        return insert != -1;
     }
 
     /**

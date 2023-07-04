@@ -2,6 +2,7 @@ package com.example.labyrinthapp;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -53,11 +54,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private SensorManager sensorManager;
     private Sensor gyroSensor;
     private long lastSensorUpdate = 0;
-    private final long SENSOR_UPDATE_INTERVAL = 500;
+    @SuppressLint("StaticFieldLeak") // see documentation
     static private MainActivity instance;
     boolean firstSensorRead = true;
     private Timer tempTimer;
-    private TimerTask tempTimerTask;
     private boolean soundOn;
     private boolean firstTempRead = true;
 
@@ -425,7 +425,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         SQLiteHandler sqLiteHandler = new SQLiteHandler(this);
         String name = StartScreenFragment.getInstance().getPlayerName();
 
-        sqLiteHandler.addPlayer(name, PlayerController.getInstance().getLevel() - 1, GameScreenFragment.getInstance().getTime());
+        boolean success = sqLiteHandler.addPlayer(name, PlayerController.getInstance().getLevel() - 1, GameScreenFragment.getInstance().getTime());
+        if(!success)
+            Log.d(TAG, "Could not add Player to database.");
         onBestenlisteClick(null);
     }
 
@@ -435,12 +437,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
      */
     public void onLabyrinthFinished() {
         if (sensorSource == SensorSource.MPU6050) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    mqttHandler.publish(pub_topic, "Labyrinth Finished");
-                }
-            }).start();
+            new Thread(() -> mqttHandler.publish(pub_topic, "Labyrinth Finished")).start();
         }
     }
 
@@ -505,6 +502,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         if(currentScreen == ScreenEnum.GAMESCREEN) {
             if (sensorEvent.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
+                long SENSOR_UPDATE_INTERVAL = 500;
                 long currentTime = System.currentTimeMillis();
                 if (currentTime - lastSensorUpdate >= SENSOR_UPDATE_INTERVAL) {
                     if(firstSensorRead) {
@@ -551,10 +549,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
      */
     private void startTemperatureTimer() {
         tempTimer = new Timer();
-        tempTimerTask = new TimerTask() {
+        TimerTask tempTimerTask = new TimerTask() {
             @Override
             public void run() {
-                if(firstTempRead) {
+                if (firstTempRead) {
                     firstTempRead = false;
                     return;
                 }
@@ -585,22 +583,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
      * @param data The data which should be displayed in the given textView.
      */
     public void displayStatus(TextView textView, String data) {
-        Thread t = new Thread() {
-            @Override
-            public void run() {
-                try {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                                textView.setText(data);
-                            }
-                    });
+        Thread t = new Thread(() -> {
+            try {
+                runOnUiThread(() -> textView.setText(data));
 
-                } catch (Exception e) {
-                    Log.d(TAG, "Failed to display textView.");
-                }
+            } catch (Exception e) {
+                Log.d(TAG, "Failed to display textView.");
             }
-        };
+        });
         t.start();
     }
 
@@ -621,12 +611,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             return;
 
         MediaPlayer mp = MediaPlayer.create(this, R.raw.connection);
-        mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mediaPlayer) {
-                mp.release();
-            }
-        });
+        mp.setOnCompletionListener(mediaPlayer -> mp.release());
         mp.start();
     }
 

@@ -1,5 +1,6 @@
 package com.example.labyrinthapp;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,6 +33,7 @@ public class PlayerAdapter extends ArrayAdapter<Player> {
      * @param parent The parent that this view will eventually be attached to.
      * @return A View corresponding to the data at the specified position.
      */
+    @SuppressLint("SetTextI18n")
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View view = convertView;

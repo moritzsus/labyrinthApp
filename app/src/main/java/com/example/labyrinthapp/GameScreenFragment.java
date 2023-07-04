@@ -1,5 +1,6 @@
 package com.example.labyrinthapp;
 
+import android.annotation.SuppressLint;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 
@@ -29,6 +30,7 @@ public class GameScreenFragment extends Fragment {
     private int cols = 8;
     private int[][] labyrinth;
     private final MediaPlayer musicPlayer;
+    @SuppressLint("StaticFieldLeak") // see documentation
     static GameScreenFragment instance;
 
     /**

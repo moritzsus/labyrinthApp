@@ -17,8 +17,6 @@ public class PlayerController {
     Direction direction = Direction.NONE;
     private int[][] labyrinth;
     LabyrinthView labyrinthView;
-    private final float verticalDeazone = 0.4f;
-    private final float horizontalDeazone = 0.5f;
     private int level = 1;
 
     /**
@@ -83,6 +81,8 @@ public class PlayerController {
      * @param y The rotation value in the y-axis.
      */
     public void movePlayer(float x, float y) {
+        float verticalDeadzone = 0.4f;
+        float horizontalDeadzone = 0.5f;
 
         // Movement paused (e.g. when in Settings screen)
         if(MainActivity.getInstance().getCurrentScreen() != MainActivity.ScreenEnum.GAMESCREEN) {
@@ -95,10 +95,10 @@ public class PlayerController {
         boolean right = false;
 
         // set direction flags
-        if(x < -verticalDeazone) up = true;
-        if(x > verticalDeazone) down = true;
-        if(y < -horizontalDeazone) left = true;
-        if(y > horizontalDeazone) right = true;
+        if(x < -verticalDeadzone) up = true;
+        if(x > verticalDeadzone) down = true;
+        if(y < -horizontalDeadzone) left = true;
+        if(y > horizontalDeadzone) right = true;
 
         // set direction depending on the flags
         determineDirection(up, down, left, right);
@@ -143,12 +143,7 @@ public class PlayerController {
                     music.stop();
 
                     MediaPlayer mp = MediaPlayer.create(MainActivity.getInstance(), R.raw.game_complete);
-                    mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                        @Override
-                        public void onCompletion(MediaPlayer mediaPlayer) {
-                            mp.release();
-                        }
-                    });
+                    mp.setOnCompletionListener(mediaPlayer -> mp.release());
                     mp.start();
                 }
             }
@@ -177,12 +172,7 @@ public class PlayerController {
                 if(MainActivity.getInstance().getSoundOn()) {
                     MediaPlayer mp = MediaPlayer.create(MainActivity.getInstance(), R.raw.level_passed);
 
-                    mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                        @Override
-                        public void onCompletion(MediaPlayer mediaPlayer) {
-                            mp.release();
-                        }
-                    });
+                    mp.setOnCompletionListener(mediaPlayer -> mp.release());
                     mp.start();
                 }
             }
