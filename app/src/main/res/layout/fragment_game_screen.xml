@@ -14,6 +14,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@color/backgroundColor"
+        android:contentDescription="@string/homeButtonDescription"
         android:onClick="onHomeButtonClick"
         android:src="@drawable/icon_home"
         app:layout_constraintBottom_toTopOf="@+id/labyrinthView"
@@ -21,13 +22,15 @@
         app:layout_constraintHorizontal_bias="0.02"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.060000002" />
+        app:layout_constraintVertical_bias="0.060000002"
+        tools:ignore="RedundantDescriptionCheck,ImageContrastCheck" />
 
     <ImageButton
         android:id="@+id/imageButton2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@color/backgroundColor"
+        android:contentDescription="@string/leaderboardButtonDescription"
         android:onClick="onBestenlisteClick"
         android:src="@drawable/icon_medal"
         app:layout_constraintBottom_toTopOf="@+id/labyrinthView"
@@ -35,12 +38,14 @@
         app:layout_constraintHorizontal_bias="0.78"
         app:layout_constraintStart_toEndOf="@+id/buttonHome"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.060000002" />
+        app:layout_constraintVertical_bias="0.060000002"
+        tools:ignore="SpeakableTextPresentCheck,RedundantDescriptionCheck,ImageContrastCheck" />
 
     <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@color/backgroundColor"
+        android:contentDescription="@string/settingsButtonDescription"
         android:onClick="onSettingsClick"
         android:src="@drawable/icon_settings"
         app:layout_constraintBottom_toTopOf="@+id/labyrinthView"
@@ -48,7 +53,8 @@
         app:layout_constraintHorizontal_bias="0.92"
         app:layout_constraintStart_toEndOf="@+id/imageButton2"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.060000002" />
+        app:layout_constraintVertical_bias="0.060000002"
+        tools:ignore="SpeakableTextPresentCheck,RedundantDescriptionCheck,ImageContrastCheck" />
 
     <com.example.labyrinthapp.LabyrinthView
         android:id="@+id/labyrinthView"
@@ -64,17 +70,20 @@
         android:id="@+id/imageView3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:contentDescription="@string/temp_icon"
         android:src="@drawable/icon_temperature"
         app:layout_constraintBottom_toTopOf="@+id/labyrinthView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.03"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/buttonHome" />
+        app:layout_constraintTop_toBottomOf="@+id/buttonHome"
+        tools:ignore="ImageContrastCheck" />
 
     <ImageView
         android:id="@+id/imageView4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:contentDescription="@string/time_icon"
         android:scaleX="0.7"
         android:scaleY="0.7"
         android:src="@drawable/icon_timer"
@@ -83,15 +92,16 @@
         app:layout_constraintHorizontal_bias="0.85"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.63" />
+        app:layout_constraintVertical_bias="0.63"
+        tools:ignore="ImageContrastCheck" />
 
     <TextView
         android:id="@+id/textViewTemp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="0.00"
+        android:text="@string/tempText"
         android:textColor="@color/white"
-        android:textSize="20dp"
+        android:textSize="20sp"
         app:layout_constraintBottom_toTopOf="@+id/labyrinthView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.02"
@@ -103,9 +113,9 @@
         android:id="@+id/textViewLevel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="1"
+        android:text="@string/levelNum"
         android:textColor="@color/white"
-        android:textSize="40dp"
+        android:textSize="40sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/labyrinthView"
         app:layout_constraintEnd_toEndOf="parent"
@@ -116,9 +126,9 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Level"
+        android:text="@string/levelTextView"
         android:textColor="@color/white"
-        android:textSize="24dp"
+        android:textSize="24sp"
         app:layout_constraintBottom_toTopOf="@+id/labyrinthView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -129,38 +139,43 @@
         android:id="@+id/textViewTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="0"
+        android:text="@string/timeNum"
         android:textColor="@color/white"
-        android:textSize="20dp"
+        android:textSize="20sp"
         app:layout_constraintBottom_toTopOf="@+id/labyrinthView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.97"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.62" />
+        app:layout_constraintVertical_bias="0.62"
+        tools:ignore="TextSizeCheck" />
 
     <ImageView
         android:id="@+id/buttonres"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="32dp"
+        android:contentDescription="@string/resign_button"
         android:onClick="onResignClick"
         android:src="@drawable/resignbutton"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/buttonnewGame"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/labyrinthView"
-        app:layout_constraintVertical_bias="0.39" />
+        app:layout_constraintVertical_bias="0.39"
+        tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck,RedundantDescriptionCheck" />
 
     <ImageView
         android:id="@+id/buttonnewGame"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:contentDescription="@string/restart_button"
         android:onClick="onRestartClick"
         android:src="@drawable/restartbutton"
         app:layout_constraintBottom_toBottomOf="@+id/buttonres"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/buttonres"
-        app:layout_constraintTop_toTopOf="@+id/buttonres" />
+        app:layout_constraintTop_toTopOf="@+id/buttonres"
+        tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck,RedundantDescriptionCheck" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

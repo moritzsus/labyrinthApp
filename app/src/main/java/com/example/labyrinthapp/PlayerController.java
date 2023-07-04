@@ -1,6 +1,7 @@
 package com.example.labyrinthapp;
 
 import android.media.MediaPlayer;
+import android.util.Log;
 
 /**
  * The PlayerController (Singleton) class handles the movement and control of the player in the labyrinth game.
@@ -46,6 +47,10 @@ public class PlayerController {
      * should send player position updates.
      */
     public void setLabyrinthView(LabyrinthView labyrinthView) {
+        if(labyrinthView == null) {
+            MainActivity.getInstance().setFirstTempRead(true);
+            return;
+        }
         this.labyrinthView = labyrinthView;
     }
 
@@ -158,10 +163,10 @@ public class PlayerController {
                         GameScreenFragment.getInstance().setLabyrinthSize(10,10);
                         break;
                     case 4:
-                        GameScreenFragment.getInstance().setLabyrinthSize(11, 11);
+                        GameScreenFragment.getInstance().setLabyrinthSize(12, 12);
                         break;
                     case 5:
-                        GameScreenFragment.getInstance().setLabyrinthSize(12,12);
+                        GameScreenFragment.getInstance().setLabyrinthSize(14,14);
                         break;
                 }
                 GameScreenFragment.getInstance().generateLabyrinth();

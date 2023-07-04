@@ -1,6 +1,6 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="#FFFFFF" /> <!-- Hintergrundfarbe des EditTexts -->
-    <corners android:radius="8dp" /> <!-- Radius für abgerundete Ecken -->
+    <solid android:color="#FFFFFF" />
+    <corners android:radius="8dp" />
     <stroke
         android:width="2dp"
         android:color="@color/light_blue_A200"/>

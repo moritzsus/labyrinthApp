@@ -583,6 +583,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
      * @param data The data which should be displayed in the given textView.
      */
     public void displayStatus(TextView textView, String data) {
+        if(textView == null) {
+            setFirstTempRead(true);
+            return;
+        }
         Thread t = new Thread(() -> {
             try {
                 runOnUiThread(() -> textView.setText(data));
@@ -626,4 +630,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
      * @return A String holding the broker address.
      */
     public String getBrokerAddress() { return broker; }
+
+    /**
+     * Sets the firstTempRead flag.
+     * @param firstRead Flag for setting firstTempRead.
+     */
+    public void setFirstTempRead(boolean firstRead) {
+        firstTempRead = firstRead;
+        mqttHandler.setFirstMsg(true);
+    }
 }

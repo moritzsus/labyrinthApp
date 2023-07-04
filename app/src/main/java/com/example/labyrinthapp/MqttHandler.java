@@ -137,4 +137,12 @@ public class MqttHandler {
     public void resetFirstRead() {
         firstMsg = true;
     }
+
+    /**
+     * Sets the this.firstMsg flag.
+     * @param firstMsg Flag for setting this.firstMsg.
+     */
+    public void setFirstMsg(boolean firstMsg) {
+        this.firstMsg = firstMsg;
+    }
 }
