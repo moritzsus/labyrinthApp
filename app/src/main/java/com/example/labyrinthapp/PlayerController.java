@@ -1,7 +1,6 @@
 package com.example.labyrinthapp;
 
 import android.media.MediaPlayer;
-import android.util.Log;
 
 /**
  * The PlayerController (Singleton) class handles the movement and control of the player in the labyrinth game.
