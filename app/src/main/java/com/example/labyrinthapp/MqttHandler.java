@@ -9,6 +9,7 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 public class MqttHandler {
+    // class based on moodle template
     private MqttClient client;
     private final MemoryPersistence persistence = new MemoryPersistence();
     private final int qos = 0;
@@ -62,14 +63,14 @@ public class MqttHandler {
                 String message = new String(msg.getPayload());
                 String[] values = message.split(",");
 
-                // length 6 = Bewegungssensordaten
+                // length 6 = MPU6050 sensor data
                 if(values.length == 6) {
                     float x = Float.parseFloat(values[3]);
                     float y = Float.parseFloat(values[4]);
 
                     PlayerController.getInstance().movePlayer(x, y);
                 }
-                //length 2 = counter und Temperatur
+                //length 2 = counter and temperature
                 if(values.length == 2) {
                     String temp = values[1].trim().substring(0, 4);
 

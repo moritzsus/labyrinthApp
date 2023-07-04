@@ -152,6 +152,7 @@ public class GameScreenFragment extends Fragment {
      * Calls the carvePassages(int row, int col) method to carve the passages.
      */
     public void generateLabyrinth() {
+        // method written with the help of ChatGPT
         int expandedRows = 2 * rows + 1;
         int expandedCols = 2 * cols + 1;
 
@@ -177,6 +178,7 @@ public class GameScreenFragment extends Fragment {
      * @param col The starting column for carving passages.
      */
     private void carvePassages(int row, int col) {
+        // method written with the help of ChatGPT
         int[][] directions = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
         Collections.shuffle(Arrays.asList(directions));
 

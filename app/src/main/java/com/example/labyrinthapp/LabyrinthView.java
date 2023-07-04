@@ -130,8 +130,6 @@ public class LabyrinthView extends AppCompatImageView {
                 float right = left + cellSize;
                 float bottom = top + cellSize;
 
-
-                // Rects have to be drawn inside onDraw(), because the function determines where to draw which rectangle
                 if(labyrinth[i][j] == 0) {
                     canvas.drawBitmap(pathTexture, null, new RectF(left + (viewWidth / 8.0f), top, right + (viewWidth / 8.0f), bottom), null);
                 }

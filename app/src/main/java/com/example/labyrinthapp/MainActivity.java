@@ -93,7 +93,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         if(savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
                     .setReorderingAllowed(true)
-                    // hereadd
                     .add(R.id.fragment_container_view, StartScreenFragment.class, null)
                     .commit();
         }
@@ -102,10 +101,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         soundOn = true;
         mqttHandler = new MqttHandler();
         mqttHandler.setBroker(broker);
-        // Initialisiere den SensorManager
-        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
-        // uberprufe, ob das Gerat einen Rotationssensor hat
+        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         gyroSensor = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
     }
 
@@ -348,7 +345,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         getSupportFragmentManager().beginTransaction()
                 .setReorderingAllowed(true)
-                //hereadd
                 .add(R.id.fragment_container_view, BestenlisteFragment.class, null)
                 .addToBackStack(null)
                 .commit();
@@ -583,6 +579,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
      * @param data The data which should be displayed in the given textView.
      */
     public void displayStatus(TextView textView, String data) {
+        // method based on moodle template
         if(textView == null) {
             setFirstTempRead(true);
             return;
