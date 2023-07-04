@@ -8,32 +8,19 @@
     android:background="@color/backgroundColor">
 
 
-    <Button
-        android:id="@+id/buttonPlay"
-        android:layout_width="132dp"
-        android:layout_height="71dp"
-        android:onClick="onPlayButtonClick"
-        android:text="Play"
-        android:textSize="30dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextName"
-        app:layout_constraintVertical_bias="0.19999999" />
-
     <ImageButton
+        android:id="@+id/imageButton4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@color/backgroundColor"
         android:onClick="onBestenlisteClick"
         android:src="@drawable/icon_medal"
-        app:layout_constraintBottom_toTopOf="@+id/editTextName"
+        app:layout_constraintBottom_toTopOf="@+id/imageView6"
         app:layout_constraintEnd_toStartOf="@+id/imageButton"
         app:layout_constraintHorizontal_bias="0.94"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.110000014" />
+        android:contentDescription="@string/leaderboardButtonDescription" />
 
     <ImageButton
         android:id="@+id/imageButton"
@@ -42,27 +29,59 @@
         android:background="@color/backgroundColor"
         android:onClick="onSettingsClick"
         android:src="@drawable/icon_settings"
-        app:layout_constraintBottom_toTopOf="@+id/editTextName"
+        app:layout_constraintBottom_toTopOf="@+id/imageView6"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.96"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.110000014" />
+        android:contentDescription="@string/settingsButtonDescription" />
 
     <EditText
         android:id="@+id/editTextName"
         android:layout_width="wrap_content"
         android:layout_height="30dp"
+        android:background="@drawable/rounded_edittext_background"
         android:ems="10"
-        android:hint="NAME"
+        android:hint="@string/namePlaceholder"
         android:inputType="text"
         android:paddingLeft="10dp"
-        android:textColor="@color/black"
         android:paddingRight="10dp"
-        android:background="@drawable/rounded_edittext_background"
+        android:textColor="@color/black"
+        app:layout_constraintBottom_toTopOf="@+id/buttonPlay"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageView6"
+        tools:ignore="Autofill" />
+
+
+    <ImageView
+        android:id="@+id/imageView6"
+        android:layout_width="329dp"
+        android:layout_height="361dp"
+        android:layout_marginStart="41dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="41dp"
+        android:scaleX="0.8"
+        android:scaleY="0.8"
+        android:src="@drawable/startscreengrafik"
+        app:layout_constraintBottom_toTopOf="@+id/editTextName"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:contentDescription="@string/lab_preview" />
+
+    <ImageView
+        android:id="@+id/buttonPlay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="132dp"
+        android:onClick="onPlayButtonClick"
+        android:src="@drawable/playbutton"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/editTextName"
+        android:contentDescription="@string/play_button" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

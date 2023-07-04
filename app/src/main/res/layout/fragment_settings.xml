@@ -11,9 +11,9 @@
         android:id="@+id/textViewSettings"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="SETTINGS"
+        android:text="@string/settings"
         android:textColor="@color/white"
-        android:textSize="28dp"
+        android:textSize="28sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -27,25 +27,27 @@
         android:background="@color/backgroundColor"
         android:onClick="onCloseClick"
         android:src="@drawable/icon_close"
-        android:text="X"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/textViewSettings"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.01999998" />
+        app:layout_constraintVertical_bias="0.01999998"
+        tools:ignore="ImageContrastCheck,SpeakableTextPresentCheck"
+        android:contentDescription="@string/close_button" />
 
     <TextView
         android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Sound"
+        android:text="@string/soundText"
         android:textColor="@color/white"
-        android:textSize="24dp"
+        android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textViewSettings"
-        app:layout_constraintVertical_bias="0.060000002" />
+        app:layout_constraintVertical_bias="0.060000002"
+        tools:ignore="TextSizeCheck" />
 
     <com.google.android.material.switchmaterial.SwitchMaterial
         android:id="@+id/soundSwitch"
@@ -66,14 +68,15 @@
         android:id="@+id/textViewSource"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Sensor Source"
+        android:text="@string/sensor_source"
         android:textColor="@color/white"
-        android:textSize="24dp"
+        android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/soundSwitch"
-        app:layout_constraintVertical_bias="0.060000002" />
+        app:layout_constraintVertical_bias="0.060000002"
+        tools:ignore="TextSizeCheck" />
 
     <RadioGroup
         android:id="@+id/radioGroup"
@@ -93,9 +96,10 @@
             android:checked="true"
             android:onClick="onSmartphoneSensorClick"
             android:padding="5dp"
-            android:text="Smartphone Sensors"
+            android:text="@string/smartphone_sensors"
             android:textColor="@color/white"
-            android:textSize="16dp" />
+            android:textSize="16sp"
+            tools:ignore="TextSizeCheck" />
 
         <RadioButton
             android:id="@+id/radioButtonMpu"
@@ -103,18 +107,19 @@
             android:layout_height="wrap_content"
             android:onClick="onMPUClick"
             android:padding="5dp"
-            android:text="MPU6050"
+            android:text="@string/mpu6050"
             android:textColor="@color/white"
-            android:textSize="16dp" />
+            android:textSize="16sp"
+            tools:ignore="TextSizeCheck" />
     </RadioGroup>
 
     <EditText
         android:id="@+id/editTextBroker"
         android:layout_width="wrap_content"
         android:layout_height="35dp"
-        android:background="@drawable/rounded_edittext_background"
+        android:background="@drawable/rounded_edittext_background_disabled"
         android:ems="10"
-        android:hint="Broker Address"
+        android:hint="@string/broker_address_hint"
         android:inputType="text"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
@@ -123,20 +128,22 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/radioGroup"
-        app:layout_constraintVertical_bias="0.01999998" />
+        app:layout_constraintVertical_bias="0.01999998"
+        tools:ignore="Autofill,TextContrastCheck" />
 
-    <Button
+    <ImageView
         android:id="@+id/buttonSave"
         android:layout_width="70dp"
         android:layout_height="40dp"
-        android:padding="0dp"
-        android:backgroundTint="@color/design_default_color_error"
-        android:text="Save"
         android:onClick="onBrokerSaveClick"
+        android:padding="0dp"
+        android:src="@drawable/savebutton"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/editTextBroker"
-        app:layout_constraintVertical_bias="0.04000002" />
+        app:layout_constraintVertical_bias="0.04000002"
+        tools:ignore="SpeakableTextPresentCheck"
+        android:contentDescription="@string/save_button" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
